@@ -1,0 +1,42 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+
+# Jupyter and local environments
+.ipynb_checkpoints/
+.python-version
+.env
+.env.*
+
+# Local data and generated artifacts
+data/raw/
+data/interim/
+data/processed/
+results/generated/
+research/sources/
+research/library.db
+research/library.db-*
+references/*
+!references/README.md
+*.tmp
+*.log
+
+# LaTeX build artifacts
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.lof
+*.log
+*.lot
+*.out
+*.run.xml
+*.synctex.gz
+*.toc

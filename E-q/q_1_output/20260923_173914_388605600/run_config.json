@@ -1,0 +1,25 @@
+{
+  "schema_version": "q1-output-v2",
+  "script": "scripts/q1_extract_features.py",
+  "seed": 20260923,
+  "steps": 50,
+  "feature_dimensions": {
+    "text": 72,
+    "audio": 20,
+    "vision": 20
+  },
+  "text_feature": "sha256-stable-token-hash-64 + 8 lexical statistics",
+  "text_timing": "inferred_uniform_text_timing",
+  "audio_feature": "ffmpeg mono 16 kHz + 12 log spectral bands + 8 signal statistics",
+  "vision_feature": "OpenCV frame statistics: color, gray, edge, motion and spatial differences",
+  "raw_root": "D:\\MCMM\\23rd-MCMM\\E-q\\dataset\\attachment_1_raw_multimodal_samples\\mosei_raw_videos_100",
+  "label_path": "D:\\MCMM\\23rd-MCMM\\E-q\\dataset\\attachment_1_raw_multimodal_samples\\mosei_raw_videos_100\\label-100.xlsx",
+  "output_root": "D:\\MCMM\\23rd-MCMM\\E-q\\q_1_output\\20260923_173914_388605600",
+  "run_id": "20260923_173914_388605600",
+  "data_boundary": "attachment_1 only; no external sentiment data; original files read-only",
+  "normalization": "no train-fitted normalization in question 1 baseline",
+  "alignment_rule": "each sample duration is divided into steps equal half-open windows [kD/L, (k+1)D/L)",
+  "padding_rule": "zero padding for invalid windows; modality_mask=0; downstream models must not infer validity from feature values",
+  "valid_lengths_definition": "count of valid windows per modality, not necessarily a contiguous sequence length",
+  "source_integrity": "sample_manifest.csv records source MP4 existence, size and SHA-256"
+}

@@ -76,7 +76,12 @@ def classify(path: Path, root: Path) -> tuple[str, int | None, str | None]:
         match = re.match(r"([A-F])\d", path.stem, re.IGNORECASE)
         if match:
             problem = match.group(1).upper()
-    kind = "paper_pdf" if path.suffix.lower() == ".pdf" else "project_markdown"
+    if path.suffix.lower() == ".pdf":
+        kind = "paper_pdf"
+    elif path.suffix.lower() == ".py":
+        kind = "project_code"
+    else:
+        kind = "project_markdown"
     return kind, year, problem
 
 
@@ -97,7 +102,7 @@ def split_text(text: str, page_size: int = 6000, overlap: int = 500):
 
 
 def extract_text(path: Path) -> tuple[str, str]:
-    if path.suffix.lower() == ".md":
+    if path.suffix.lower() in {".md", ".py"}:
         return path.read_text(encoding="utf-8"), "ok"
     executable = shutil.which("pdftotext")
     if not executable:
@@ -115,10 +120,10 @@ def extract_text(path: Path) -> tuple[str, str]:
 
 
 def iter_sources(root: Path):
-    for directory in (root / "references", root / "research", root / "prompts"):
+    for directory in (root / "references", root / "research", root / "prompts", root / "CMU-MOSEI"):
         if directory.exists():
             for path in sorted(directory.rglob("*")):
-                if path.is_file() and path.suffix.lower() in {".pdf", ".md"}:
+                if path.is_file() and path.suffix.lower() in {".pdf", ".md", ".py"}:
                     yield path
 
 

@@ -1,0 +1,97 @@
+{
+  "sample_id": "-UuX1xuaiiE_0",
+  "video_id": "-UuX1xuaiiE",
+  "clip_id": "0",
+  "text": "^it's amazing to see their enthusiasm and their passion",
+  "label": 2.6666667461395264,
+  "annotation": "Positive",
+  "duration_sec": 3.6333333333333333,
+  "tokens": [
+    {
+      "token_index": 0,
+      "token": "^",
+      "start_sec": 0.0,
+      "end_sec": 0.36333333333333334,
+      "window_index": 2,
+      "time_source": "inferred_uniform_text_timing"
+    },
+    {
+      "token_index": 1,
+      "token": "it's",
+      "start_sec": 0.36333333333333334,
+      "end_sec": 0.7266666666666667,
+      "window_index": 7,
+      "time_source": "inferred_uniform_text_timing"
+    },
+    {
+      "token_index": 2,
+      "token": "amazing",
+      "start_sec": 0.7266666666666667,
+      "end_sec": 1.09,
+      "window_index": 12,
+      "time_source": "inferred_uniform_text_timing"
+    },
+    {
+      "token_index": 3,
+      "token": "to",
+      "start_sec": 1.09,
+      "end_sec": 1.4533333333333334,
+      "window_index": 17,
+      "time_source": "inferred_uniform_text_timing"
+    },
+    {
+      "token_index": 4,
+      "token": "see",
+      "start_sec": 1.4533333333333334,
+      "end_sec": 1.8166666666666669,
+      "window_index": 22,
+      "time_source": "inferred_uniform_text_timing"
+    },
+    {
+      "token_index": 5,
+      "token": "their",
+      "start_sec": 1.8166666666666669,
+      "end_sec": 2.18,
+      "window_index": 27,
+      "time_source": "inferred_uniform_text_timing"
+    },
+    {
+      "token_index": 6,
+      "token": "enthusiasm",
+      "start_sec": 2.18,
+      "end_sec": 2.5433333333333334,
+      "window_index": 32,
+      "time_source": "inferred_uniform_text_timing"
+    },
+    {
+      "token_index": 7,
+      "token": "and",
+      "start_sec": 2.5433333333333334,
+      "end_sec": 2.9066666666666667,
+      "window_index": 37,
+      "time_source": "inferred_uniform_text_timing"
+    },
+    {
+      "token_index": 8,
+      "token": "their",
+      "start_sec": 2.9066666666666667,
+      "end_sec": 3.2700000000000005,
+      "window_index": 42,
+      "time_source": "inferred_uniform_text_timing"
+    },
+    {
+      "token_index": 9,
+      "token": "passion",
+      "start_sec": 3.2700000000000005,
+      "end_sec": 3.6333333333333337,
+      "window_index": 47,
+      "time_source": "inferred_uniform_text_timing"
+    }
+  ],
+  "window_count": 50,
+  "feature_dimensions": {
+    "text": 72,
+    "audio": 20,
+    "vision": 20
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "schema_version": "q1-audit-v2",
+  "checks": {
+    "source_label_count_is_100": true,
+    "all_source_rows_processed": true,
+    "sample_ids_unique": true,
+    "manifest_labels_npz_one_to_one": true,
+    "each_sample_has_expected_time_windows": true,
+    "feature_shapes_match_manifest": true,
+    "mask_values_binary": true,
+    "invalid_windows_are_zero": true,
+    "finite_features": true,
+    "source_hashes_present_for_existing_files": true
+  },
+  "definitions": {
+    "feature_row_index": "stable zero-based row in text/audio/vision/modality_mask arrays",
+    "valid_lengths": "sum of each modality mask over the 50 windows",
+    "padding": "zero-valued feature vector with corresponding mask equal to 0",
+    "text_alignment": "uniformly inferred token timing; not an observed word-level timestamp"
+  },
+  "passed": true
+}

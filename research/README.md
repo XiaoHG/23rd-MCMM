@@ -7,7 +7,8 @@
 - `source-catalog.md`：来源清单，区分官方来源、公开代码/论文、经验文章和待核验内容。
 - `problem-trends.md`：2023--2025 年公开赛题矩阵、题型趋势与建模启示。
 - `prompt-playbook.md`：Codex 项目中的提示词工作流、模板和反幻觉约束。
-- `library.db`：由 `scripts/build_library.py` 生成的本地 SQLite/FTS5 检索库，索引论文文本、Markdown 笔记和来源元数据。
+- `library.db`：由 `scripts/build_library.py` 生成的本地 SQLite/FTS5 检索库，索引论文文本、Markdown 笔记、专题工程源码和来源元数据。
+- `../CMU-MOSEI/README.md`：CMU-MOSEI 专题资料总览，包含论文研究进展、模型框架、E 题适用性和 `Multimodal-Sentiment-Analysis` 工程审查；对应阅读卡片位于 `notes/cmu-mosei-literature.md`。
 
 ## 资料使用规则
 
@@ -47,3 +48,5 @@ python scripts/search_library.py "WLAN 吞吐" --limit 20 --json
 ```
 
 数据库只作为候选资料定位器；正式引用前仍需打开原始论文、题面或官方文件核对上下文、页码和来源。
+
+CMU-MOSEI 专题资料的使用顺序：先读 `CMU-MOSEI/README.md`，再用 `research/library.db` 按论文标题、模型名或“alignment/reliability/missing modality/explainability”等关键词定位原文，最后回到对应 PDF 和源码核对。资料中的实验指标只能作为待复现参考。

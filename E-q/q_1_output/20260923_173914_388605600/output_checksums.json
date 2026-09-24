@@ -1,0 +1,15 @@
+{
+  "anomalies.csv": "bae5c82898dbfc23519d4b9515efca934df27433294ff16e8d82a6aa5bb7eeb2",
+  "input_file_manifest.csv": "014d58c406564ccfca123da280a585fb70c893681e0e730122c1bd9779dfb7ac",
+  "labels.csv": "d5a41decb850408126c890fcc474d678b31a268de94e1cd2052fff29cd61fb0c",
+  "q1_aligned_features.npz": "88848df57165420234026d128e286e97143beed514f2f4d78ba67f3403cfc55b",
+  "run_config.json": "7f8cec3bb8ac5f74bc34e139edc2f1a887d953eeadc0ad10e6984e734bee8aae",
+  "run_summary.json": "094f8892de84c9bd2b879a795fdd01e62ed595cf222adda631ef94eb221d5650",
+  "sample_manifest.csv": "4277fd2acf02591c4ccec6f9560444207495da451a2a8a609caf999e5eed7d06",
+  "text_token_mapping.csv": "5a7b7be4b04cee0515603fe0c60f0f50cafa5893c7720f6f2bda4389b60ce29f",
+  "time_mapping.csv": "128b6c2cbc7410dd675df101fbfa1ad2585972106b86890ba86ba2d2984695f6",
+  "typical_sample.json": "8d30d9eb37c24acd5d904e6b36b6f363d8060da9eef87d0e9d44b5683f9411f4",
+  "typical_sample_timeline.png": "0765a8e6a08ca3c931a75fa4ae82754a7ed9937d4e8a5f13b9f264b425619bbe",
+  "validation_audit.json": "948e0f9076c66cfd94f5456042d43ea2c7358da5d1cbd0f6717d275032b8833d",
+  "video_metadata.csv": "8824f0df613dab735e8f22aac4a7ce08f4132b9c627b90cb768e04075a28f6bb"
+}

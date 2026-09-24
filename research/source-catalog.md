@@ -41,3 +41,14 @@
 ## 5. 暂不批量下载的原因
 
 近三年优秀论文的公开集合规模较大，且部分通过网盘分发、版权和文件稳定性不明确。当前仓库已有一批本地缓存，详见 `references/README.md`；后续仍只下载与某一道题直接相关的少量论文，并在 `research/notes/` 建立阅读记录：来源 URL、下载日期、文件哈希、题目、方法、可复现性和可疑点。
+
+## 6. CMU-MOSEI 专题资料
+
+| 路径 | 内容 | 使用方式 | 证据状态 |
+| --- | --- | --- | --- |
+| `CMU-MOSEI/README.md` | CMU-MOSEI 论文、研究进展、模型框架、E 题映射和 GitHub 工程审查 | 先读总览，再按论文文件核对原文 | 资料归纳，指标须复现 |
+| `research/notes/cmu-mosei-literature.md` | 可检索的专题阅读卡片和方法谱系 | 用于关键词检索和定位原始 PDF | 资料归纳 |
+| `CMU-MOSEI/Multimodal-Sentiment-Analysis/` | PyTorch MulT、TFN 风格高阶融合、CTC 软对齐工程 | 仅作代码结构和基线参考，需适配 E-q | 源码已读，未完成 E 题复现 |
+| `CMU-MOSEI/*.pdf` | 24 个本地论文/预印本文件 | 以本地文件为核对对象，正式引用前记录版本与哈希 | 原始文件，来源链接待逐份补齐 |
+
+该专题资料由 `scripts/build_library.py` 纳入 `research/library.db`，索引 PDF、Markdown 和专题工程源码；未完成的 `.crdownload` 文件不纳入索引。

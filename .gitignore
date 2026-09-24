@@ -40,3 +40,18 @@ references/*
 *.run.xml
 *.synctex.gz
 *.toc
+
+# others
+26-tq/*
+E-q/dataset/*
+
+# Local IDE, scratch processing, and bundled source archives
+.idea/
+processing/
+CMU-MOSEI/*.zip
+CMU-MOSEI/**/*.pdf
+CMU-MOSEI/Multimodal-Sentiment-Analysis/
+E-q/*.zip
+E-q/*.docx
+**/__pycache__/
+CMU-MOSEI/Multimodal-Sentiment-Analysis/pre_trained_models/*.pt

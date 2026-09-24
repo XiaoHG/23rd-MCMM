@@ -1,0 +1,23 @@
+{
+  "status": "completed",
+  "best_valid_loss": 1.1868898776861339,
+  "metrics": [
+    {
+      "split": "valid",
+      "accuracy": 0.5975274725274725,
+      "macro_f1": 0.5015798726930777,
+      "mae": 0.6532918810844421,
+      "pearson": 0.5771827831008282
+    },
+    {
+      "split": "test",
+      "accuracy": 0.6629986244841816,
+      "macro_f1": 0.5367272133937053,
+      "mae": 0.6763536334037781,
+      "pearson": 0.6352106142801218
+    }
+  ],
+  "output_dir": "D:\\MCMM\\23rd-MCMM\\E-q\\q_3_output\\20260924_122221_377770800",
+  "explanations_are_model_sensitivity": true,
+  "attachment4_has_no_ground_truth": true
+}

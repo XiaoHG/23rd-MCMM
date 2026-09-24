@@ -1,0 +1,2 @@
+﻿sample_id,pred_class,pred_regression,modality_score_text,modality_score_audio,modality_score_vision,modality_contrib_text,modality_contrib_audio,modality_contrib_vision,main_modality,explanation_method
+'-UacrmKiTn4$_$7,1,0.9821176528930664,0.8382255434989929,0.31583496928215027,0.24660590291023254,0.5984476804733276,0.22548907995224,0.17606326937675476,text,counterfactual_occlusion

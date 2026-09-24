@@ -1,0 +1,10 @@
+﻿sample_id,modality,rank,start_index,end_index,impact_score,time_source
+'-UacrmKiTn4$_$7,text,1,40,44,0.17924407124519348,aligned_window_index; source mapping required
+'-UacrmKiTn4$_$7,text,2,15,19,0.1758863776922226,aligned_window_index; source mapping required
+'-UacrmKiTn4$_$7,text,3,30,34,0.16391097009181976,aligned_window_index; source mapping required
+'-UacrmKiTn4$_$7,audio,1,5,9,0.07441739737987518,aligned_window_index; source mapping required
+'-UacrmKiTn4$_$7,audio,2,15,19,0.034896690398454666,aligned_window_index; source mapping required
+'-UacrmKiTn4$_$7,audio,3,30,34,0.019092589616775513,aligned_window_index; source mapping required
+'-UacrmKiTn4$_$7,vision,1,15,19,0.0509733110666275,aligned_window_index; source mapping required
+'-UacrmKiTn4$_$7,vision,2,0,4,0.02401616796851158,aligned_window_index; source mapping required
+'-UacrmKiTn4$_$7,vision,3,40,44,0.011816537007689476,aligned_window_index; source mapping required

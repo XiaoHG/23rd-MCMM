@@ -1,0 +1,10 @@
+{
+  "schema_version": "q3-audit-v1",
+  "passed": true,
+  "checks": {
+    "train_valid_test_ids_disjoint": true,
+    "train_valid_test_have_labels": true,
+    "all_output_files_finite_or_serialized": true,
+    "attachment4_used_only_for_inference": true
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "anomalies.csv": "63ed9741e4ca68f222781e5c140884d9db80cbbbc4e1dccd5e3d229515331f36",
+  "best_model.pt": "6ffafb058d6f30d2eee56453fc88fd52f4125172fcc795b281d0a0b3d24275d5",
+  "evidence_mapping_attachment4.csv": "30debf6c4882f36ec46573b69395a54272303ade838d93815386bf4c56298658",
+  "evidence_mapping_valid.csv": "7b0da45226ed5351011458de5f867276b037b0b7a9ed8965bc37783230faf0e5",
+  "explanations_valid.csv": "fb648c0ce5eb3dbb2f9edfc12d568098e6c6211284e72274da034e163a690419",
+  "model_metrics.csv": "999a54dddc69abe188dcde979cf42bfb24b8508ba889d5bb1651934e5d9a0dd8",
+  "predictions_attachment4.csv": "bc2c56bc4bfadcc6e8fc178113251daac576f2a2d27da4e224bb0096358321cf",
+  "predictions_test.csv": "3fadf06b353858c0b8ed8c820efdd7765ced3c2318aa87418e131de05321f223",
+  "predictions_valid.csv": "ade7e769c1d4ad09aa2c0e256648566947de48f8400207030761043589e9c292",
+  "run_config.json": "50b2db8c9218bd13b432df87f753091c869057306663d11ffe6d0b227c597db9",
+  "train_standardizer.npz": "a50d8f9d020c341a0e3f4956d0a9b7b6dacddb3d74f506ca4da81b62b25f6e8d",
+  "training_log.csv": "50bb40bf00034c3633f5eb6cabcd1280d7caa17057e98161dd6b842e24b3213d"
+}

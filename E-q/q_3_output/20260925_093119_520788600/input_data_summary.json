@@ -1,0 +1,113 @@
+{
+  "feature_sha256": "66e867aa74bc70a844e806e5571e371c9abb4a35f9e2887ce9b4d97ff2cb8fcd",
+  "splits": {
+    "train": {
+      "split": "train",
+      "sample_count": 3395,
+      "unique_sample_ids": 3395,
+      "feature_shapes": {
+        "text": [
+          3395,
+          50,
+          768
+        ],
+        "audio": [
+          3395,
+          50,
+          74
+        ],
+        "vision": [
+          3395,
+          50,
+          35
+        ],
+        "mask": [
+          3395,
+          50,
+          3
+        ]
+      },
+      "mask_dtype": "bool",
+      "classification_distribution": {
+        "0": 967,
+        "1": 758,
+        "2": 1670
+      },
+      "regression_min": -3.0,
+      "regression_max": 3.0,
+      "feature_finite": true
+    },
+    "valid": {
+      "split": "valid",
+      "sample_count": 728,
+      "unique_sample_ids": 728,
+      "feature_shapes": {
+        "text": [
+          728,
+          50,
+          768
+        ],
+        "audio": [
+          728,
+          50,
+          74
+        ],
+        "vision": [
+          728,
+          50,
+          35
+        ],
+        "mask": [
+          728,
+          50,
+          3
+        ]
+      },
+      "mask_dtype": "bool",
+      "classification_distribution": {
+        "0": 206,
+        "1": 184,
+        "2": 338
+      },
+      "regression_min": -3.0,
+      "regression_max": 3.0,
+      "feature_finite": true
+    },
+    "test": {
+      "split": "test",
+      "sample_count": 727,
+      "unique_sample_ids": 727,
+      "feature_shapes": {
+        "text": [
+          727,
+          50,
+          768
+        ],
+        "audio": [
+          727,
+          50,
+          74
+        ],
+        "vision": [
+          727,
+          50,
+          35
+        ],
+        "mask": [
+          727,
+          50,
+          3
+        ]
+      },
+      "mask_dtype": "bool",
+      "classification_distribution": {
+        "0": 207,
+        "1": 158,
+        "2": 362
+      },
+      "regression_min": -3.0,
+      "regression_max": 3.0,
+      "feature_finite": true
+    }
+  }
+}

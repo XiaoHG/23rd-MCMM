@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import pickle
+import sys
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -57,30 +58,54 @@ def _full_mask(text: np.ndarray, audio: np.ndarray, vision: np.ndarray) -> np.nd
     if audio.shape[1] != length or vision.shape[1] != length:
         raise ValueError("aligned 输入三模态时间长度不一致")
     # 附件二 aligned 文件没有独立 mask；有效数据均为固定 50 窗口。
-    mask = np.ones((n, length, 3), dtype=np.float32)
+    mask = np.ones((n, length, 3), dtype=bool)
     for index, arr in enumerate((text, audio, vision)):
-        mask[:, :, index] = np.isfinite(arr).all(axis=2).astype(np.float32)
+        mask[:, :, index] = np.isfinite(arr).all(axis=2)
     return mask
+
+
+def _pickle_load(path: Path) -> Any:
+    """兼容 NumPy 2.x 写出、NumPy 1.x 读取的 pickle 模块路径。"""
+    # NumPy 2 将部分 pickle 路径从 numpy.core 改为 numpy._core；数组格式本身
+    # 在本项目中仍兼容，因此仅在导入失败时提供模块别名，不改写原始数据。
+    try:
+        with path.open("rb") as handle:
+            return pickle.load(handle)
+    except ModuleNotFoundError as exc:
+        if not str(exc).startswith("No module named 'numpy._core"):
+            raise
+        import numpy.core as numpy_core
+
+        sys.modules.setdefault("numpy._core", numpy_core)
+        for name in ("numeric", "multiarray", "_multiarray_umath", "shape_base"):
+            module = getattr(numpy_core, name, None)
+            if module is not None:
+                sys.modules.setdefault(f"numpy._core.{name}", module)
+        with path.open("rb") as handle:
+            return pickle.load(handle)
 
 
 def load_attachment2(path: str | Path, split: str) -> FeatureBundle:
     """读取附件二 aligned pickle 的一个划分，不读取或混用其他划分。"""
     path = Path(path)
-    with path.open("rb") as handle:
-        data = pickle.load(handle)
+    data = _pickle_load(path)
     if split not in data:
         raise KeyError(f"pickle 中没有划分 {split!r}，可用划分为 {list(data)}")
     part = data[split]
-    text = _as_float32(part["text"])
-    audio = _as_float32(part["audio"])
-    vision = _as_float32(part["vision"])
+    raw_text = np.asarray(part["text"], dtype=np.float32)
+    raw_audio = np.asarray(part["audio"], dtype=np.float32)
+    raw_vision = np.asarray(part["vision"], dtype=np.float32)
+    mask = _full_mask(raw_text, raw_audio, raw_vision)
+    text = np.nan_to_num(raw_text, nan=0.0, posinf=0.0, neginf=0.0)
+    audio = np.nan_to_num(raw_audio, nan=0.0, posinf=0.0, neginf=0.0)
+    vision = np.nan_to_num(raw_vision, nan=0.0, posinf=0.0, neginf=0.0)
     ids = [str(x) for x in part["id"]]
     bundle = FeatureBundle(
         ids=ids,
         text=text,
         audio=audio,
         vision=vision,
-        mask=_full_mask(text, audio, vision),
+        mask=mask,
         regression=_as_float32(part["regression_labels"]).reshape(-1),
         classification=np.asarray(part["classification_labels"], dtype=np.int64).reshape(-1),
         split=split,
@@ -98,16 +123,19 @@ def load_attachment4(directory: str | Path, feature_version: str = "aligned") ->
         raise FileNotFoundError(f"没有找到附件四 {feature_version} pickle：{directory}")
     rows: list[dict[str, Any]] = []
     for path in files:
-        with path.open("rb") as handle:
-            item = pickle.load(handle)
+        item = _pickle_load(path)
         if not isinstance(item, dict):
             raise ValueError(f"附件四文件不是字典：{path}")
         rows.append(item)
-    text = _as_float32(np.stack([x["text"] for x in rows]))
-    audio = _as_float32(np.stack([x["audio"] for x in rows]))
-    vision = _as_float32(np.stack([x["vision"] for x in rows]))
+    raw_text = np.asarray(np.stack([x["text"] for x in rows]), dtype=np.float32)
+    raw_audio = np.asarray(np.stack([x["audio"] for x in rows]), dtype=np.float32)
+    raw_vision = np.asarray(np.stack([x["vision"] for x in rows]), dtype=np.float32)
+    mask = _full_mask(raw_text, raw_audio, raw_vision)
+    text = np.nan_to_num(raw_text, nan=0.0, posinf=0.0, neginf=0.0)
+    audio = np.nan_to_num(raw_audio, nan=0.0, posinf=0.0, neginf=0.0)
+    vision = np.nan_to_num(raw_vision, nan=0.0, posinf=0.0, neginf=0.0)
     ids = [str(x.get("id", files[i].stem)) for i, x in enumerate(rows)]
-    bundle = FeatureBundle(ids, text, audio, vision, _full_mask(text, audio, vision), split="attachment4", raw_text=[str(x.get("raw_text", "")) for x in rows])
+    bundle = FeatureBundle(ids, text, audio, vision, mask, split="attachment4", raw_text=[str(x.get("raw_text", "")) for x in rows])
     bundle.validate()
     return bundle
 
@@ -129,7 +157,7 @@ def apply_standardizer(bundle: FeatureBundle, stats: dict[str, tuple[np.ndarray,
     for name in MODALITIES:
         mean, std = stats[name]
         kwargs[name] = ((getattr(bundle, name) - mean) / std).astype(np.float32)
-    result = FeatureBundle(bundle.ids, kwargs["text"], kwargs["audio"], kwargs["vision"], bundle.mask.copy(), bundle.regression, bundle.classification, bundle.split, bundle.raw_text)
+    result = FeatureBundle(bundle.ids, kwargs["text"], kwargs["audio"], kwargs["vision"], bundle.mask.astype(bool, copy=True), bundle.regression, bundle.classification, bundle.split, bundle.raw_text)
     result.validate()
     return result
 

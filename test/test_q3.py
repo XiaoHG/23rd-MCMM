@@ -31,6 +31,7 @@ class TestQ3(unittest.TestCase):
         stats = fit_standardizer(self.bundle)
         standardized = apply_standardizer(self.bundle, stats)
         self.assertEqual(standardized.text.shape, (3, 6, 8))
+        self.assertEqual(standardized.mask.dtype, np.bool_)
         self.assertTrue(np.isfinite(standardized.text).all())
 
     def test_model_masks_padding_and_missing_modality(self):
@@ -48,6 +49,30 @@ class TestQ3(unittest.TestCase):
         self.assertTrue(torch.isfinite(output["logits"]).all())
         self.assertTrue(torch.isfinite(output["regression"]).all())
         self.assertTrue(torch.isfinite(output["gates"]).all())
+
+    def test_nonfinite_features_become_invalid_mask_before_cleaning(self):
+        from src.q_3.data import load_attachment2
+        import pickle
+        from tempfile import TemporaryDirectory
+        from pathlib import Path
+
+        with TemporaryDirectory() as directory:
+            path = Path(directory) / "features.pkl"
+            payload = {
+                "train": {
+                    "id": ["sample"],
+                    "text": np.array([[[np.nan, 1.0]]], dtype=np.float32),
+                    "audio": np.zeros((1, 1, 1), dtype=np.float32),
+                    "vision": np.zeros((1, 1, 1), dtype=np.float32),
+                    "regression_labels": [0.0],
+                    "classification_labels": [1],
+                }
+            }
+            with path.open("wb") as handle:
+                pickle.dump(payload, handle)
+            bundle = load_attachment2(path, "train")
+            self.assertFalse(bool(bundle.mask[0, 0, 0]))
+            self.assertEqual(float(bundle.text[0, 0, 0]), 0.0)
 
     def test_counterfactual_explanation_contract(self):
         model = MaskedMultimodalNet({"text": 8, "audio": 4, "vision": 3}, hidden_dim=16, heads=4, layers=1, max_length=6)

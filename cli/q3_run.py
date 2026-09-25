@@ -3,6 +3,7 @@
 示例：
     python cli/q3_run.py --epochs 2 --batch-size 64
     python cli/q3_run.py --epochs 1 --max-train-samples 64 --max-valid-samples 32 --explain-max-samples 4
+    python cli/q3_run.py --checkpoint E-q/q_3_output/<run>/best_model.pt --run-attachment4
 
 默认使用附件二 aligned_50.pkl。训练只读取 train，valid 用于早停和模型选择，
 test 只在模型固定后评估；附件四只有显式传入 --run-attachment4 才会推理。
@@ -18,6 +19,12 @@ import random
 import sys
 import time
 from pathlib import Path
+
+# Windows 下 Conda MKL 与 PyTorch wheel 可能各自加载 OpenMP runtime。
+# 限制线程数并允许重复 runtime，避免 OMP Error #15 直接终止训练进程。
+os.environ.setdefault("OMP_NUM_THREADS", "1")
+os.environ.setdefault("MKL_NUM_THREADS", "1")
+os.environ.setdefault("KMP_DUPLICATE_LIB_OK", "TRUE")
 
 import numpy as np
 import torch
@@ -54,7 +61,7 @@ class BundleDataset(Dataset):
 
     def __getitem__(self, index: int):
         b = self.bundle
-        result = {"text": torch.from_numpy(b.text[index]), "audio": torch.from_numpy(b.audio[index]), "vision": torch.from_numpy(b.vision[index]), "mask": torch.from_numpy(b.mask[index]), "index": index}
+        result = {"text": torch.from_numpy(b.text[index]), "audio": torch.from_numpy(b.audio[index]), "vision": torch.from_numpy(b.vision[index]), "mask": torch.from_numpy(b.mask[index]).to(torch.bool), "index": index}
         if b.regression is not None:
             result["regression"] = torch.tensor(b.regression[index], dtype=torch.float32)
         if b.classification is not None:
@@ -66,12 +73,14 @@ def batch_to_device(batch, device):
     return {k: v.to(device) if torch.is_tensor(v) else v for k, v in batch.items()}
 
 
-def run_epoch(model, loader, device, optimizer=None, cls_weight=1.0, reg_weight=1.0):
+def run_epoch(model, loader, device, optimizer=None, cls_weight=1.0, reg_weight=1.0, class_weights=None):
     training = optimizer is not None
     model.train(training)
-    ce = nn.CrossEntropyLoss()
+    ce = nn.CrossEntropyLoss(weight=class_weights)
     smooth = nn.SmoothL1Loss()
     total = 0.0
+    batches = 0
+    optimizer_steps = 0
     for batch in loader:
         batch = batch_to_device(batch, device)
         output = model(batch["text"], batch["audio"], batch["vision"], batch["mask"])
@@ -81,8 +90,44 @@ def run_epoch(model, loader, device, optimizer=None, cls_weight=1.0, reg_weight=
             loss.backward()
             torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
             optimizer.step()
+            optimizer_steps += 1
         total += float(loss.item()) * len(batch["text"])
-    return total / len(loader.dataset)
+        batches += 1
+    if batches == 0:
+        raise RuntimeError("数据加载器为空，无法执行训练或验证")
+    return total / len(loader.dataset), batches, optimizer_steps
+
+
+def parameter_l2_norm(model: nn.Module) -> float:
+    """记录模型参数规模，用于核验训练过程中参数确实发生变化。"""
+    total = 0.0
+    with torch.no_grad():
+        for parameter in model.parameters():
+            total += float(parameter.detach().float().pow(2).sum().item())
+    return total ** 0.5
+
+
+def bundle_summary(bundle: FeatureBundle) -> dict:
+    """写入实际加载数据的摘要，不保存原始特征副本。"""
+    return {
+        "split": bundle.split,
+        "sample_count": len(bundle.ids),
+        "unique_sample_ids": len(set(bundle.ids)),
+        "feature_shapes": {
+            "text": list(bundle.text.shape),
+            "audio": list(bundle.audio.shape),
+            "vision": list(bundle.vision.shape),
+            "mask": list(bundle.mask.shape),
+        },
+        "mask_dtype": str(bundle.mask.dtype),
+        "classification_distribution": {
+            str(int(label)): int((bundle.classification == label).sum())
+            for label in sorted(set(bundle.classification.tolist()))
+        } if bundle.classification is not None else None,
+        "regression_min": float(bundle.regression.min()) if bundle.regression is not None else None,
+        "regression_max": float(bundle.regression.max()) if bundle.regression is not None else None,
+        "feature_finite": all(np.isfinite(getattr(bundle, name)).all() for name in ("text", "audio", "vision")),
+    }
 
 
 @torch.no_grad()
@@ -146,9 +191,108 @@ def save_predictions(path: Path, bundle: FeatureBundle, pred, gates, split: str)
     write_csv(path, rows, list(rows[0]))
 
 
+def load_saved_standardizer(path: Path) -> dict[str, tuple[np.ndarray, np.ndarray]]:
+    """加载训练阶段保存的标准化参数，推理时禁止重新拟合。"""
+    if not path.exists():
+        raise FileNotFoundError(f"找不到标准化参数文件：{path}")
+    data = np.load(path)
+    stats = {}
+    for modality in ("text", "audio", "vision"):
+        mean_key, std_key = f"{modality}_mean", f"{modality}_std"
+        if mean_key not in data or std_key not in data:
+            raise ValueError(f"标准化文件缺少 {mean_key}/{std_key}")
+        stats[modality] = (np.asarray(data[mean_key], dtype=np.float32), np.asarray(data[std_key], dtype=np.float32))
+    return stats
+
+
+def write_output_checksums(output_dir: Path) -> None:
+    checksums = {}
+    for path in sorted(output_dir.iterdir()):
+        if path.name == "output_checksums.json" or not path.is_file():
+            continue
+        checksums[path.name] = sha256_file(path)
+    (output_dir / "output_checksums.json").write_text(json.dumps(checksums, ensure_ascii=False, indent=2), encoding="utf-8")
+
+
+def run_attachment4_inference(args: argparse.Namespace, device: torch.device) -> None:
+    """使用已有 checkpoint 对附件四做纯推理，不训练、不读取附件二标签。"""
+    checkpoint_path = Path(args.checkpoint).expanduser().resolve()
+    if not checkpoint_path.exists():
+        raise FileNotFoundError(f"找不到模型权重：{checkpoint_path}")
+    checkpoint = torch.load(checkpoint_path, map_location="cpu")
+    if not isinstance(checkpoint, dict) or "state_dict" not in checkpoint or "config" not in checkpoint:
+        raise ValueError("checkpoint 必须包含 state_dict 和 config 字段")
+    saved_config = checkpoint["config"]
+    input_dims = saved_config.get("input_dims")
+    if not input_dims:
+        raise ValueError("checkpoint config 缺少 input_dims，无法恢复模型结构")
+    a4_root = ROOT / "E-q" / "dataset" / "attachment_4_explainability_videos_and_features" / "attachment_4_explainability_videos_and_features"
+    bundle_raw = load_attachment4(a4_root, "aligned")
+    standardizer_path = Path(args.standardizer).expanduser().resolve() if args.standardizer else checkpoint_path.parent / "train_standardizer.npz"
+    stats = load_saved_standardizer(standardizer_path)
+    bundle = apply_standardizer(bundle_raw, stats)
+    model = MaskedMultimodalNet(
+        input_dims={name: int(input_dims[name]) for name in ("text", "audio", "vision")},
+        hidden_dim=int(saved_config.get("hidden_dim", 64)),
+        heads=int(saved_config.get("heads", 4)),
+        layers=int(saved_config.get("layers", 1)),
+        dropout=float(saved_config.get("dropout", 0.1)),
+        max_length=int(bundle.text.shape[1]),
+    ).to(device)
+    model.load_state_dict(checkpoint["state_dict"], strict=True)
+    model.eval()
+    output_dir = timestamp_dir(ROOT / "E-q" / "q_3_output")
+    config = {
+        "mode": "attachment4_inference_only",
+        "device": str(device),
+        "checkpoint": str(checkpoint_path),
+        "checkpoint_sha256": sha256_file(checkpoint_path),
+        "standardizer": str(standardizer_path),
+        "standardizer_sha256": sha256_file(standardizer_path),
+        "feature_version": "aligned",
+        "sample_count": len(bundle.ids),
+        "input_dims": input_dims,
+        "data_boundary": "attachment4 inference only; no training, tuning, or ground-truth metrics",
+        "pretrained_model": "checkpoint supplied by user",
+        "seed": args.seed,
+        "explain_batch_size": args.explain_batch_size,
+        "explain_window": args.explain_window,
+        "explain_stride": args.explain_stride,
+        "top_k": args.top_k,
+    }
+    (output_dir / "run_config.json").write_text(json.dumps(config, ensure_ascii=False, indent=2), encoding="utf-8")
+    (output_dir / "input_data_summary.json").write_text(json.dumps({"checkpoint_sha256": config["checkpoint_sha256"], "standardizer_sha256": config["standardizer_sha256"], "attachment4": bundle_summary(bundle)}, ensure_ascii=False, indent=2), encoding="utf-8")
+    dataset = BundleDataset(bundle)
+    loader = DataLoader(dataset, batch_size=args.explain_batch_size, shuffle=False, num_workers=0)
+    rows, mappings = make_explanations(model, loader, bundle, device, args)
+    for row in rows:
+        row["split"] = "attachment4"
+    write_csv(output_dir / "predictions_attachment4.csv", rows, list(rows[0]) if rows else ["sample_id"])
+    write_csv(output_dir / "evidence_mapping_attachment4.csv", mappings, list(mappings[0]) if mappings else ["sample_id"])
+    summary = {
+        "status": "completed",
+        "mode": "attachment4_inference_only",
+        "epochs_requested": 0,
+        "epochs_completed": 0,
+        "optimizer_steps": 0,
+        "sample_count": len(bundle.ids),
+        "output_dir": str(output_dir),
+        "ground_truth_available": False,
+        "metrics": None,
+    }
+    (output_dir / "run_summary.json").write_text(json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8")
+    write_output_checksums(output_dir)
+    print(json.dumps(summary, ensure_ascii=False, indent=2))
+
+
 def main(args: argparse.Namespace) -> None:
     seed_all(args.seed)
     device = torch.device(args.device if args.device else ("cuda" if torch.cuda.is_available() else "cpu"))
+    if args.checkpoint:
+        if not args.run_attachment4:
+            raise ValueError("使用 --checkpoint 时必须同时指定 --run-attachment4；当前仅支持附件四纯推理")
+        run_attachment4_inference(args, device)
+        return
     data_root = ROOT / "E-q" / "dataset" / "attachment_2_feature_files"
     feature_path = data_root / f"{args.feature_version}_50.pkl"
     if args.feature_version != "aligned":
@@ -170,14 +314,29 @@ def main(args: argparse.Namespace) -> None:
     config = vars(args).copy()
     config.update({"device": str(device), "feature_path": str(feature_path), "feature_sha256": sha256_file(feature_path), "train_count": len(train_ds), "valid_count": len(valid_ds), "test_count": len(test_ds), "input_dims": {"text": int(train.text.shape[-1]), "audio": int(train.audio.shape[-1]), "vision": int(train.vision.shape[-1])}, "data_boundary": "attachment2 train/valid/test; attachment4 inference only", "pretrained_model": "none; attachment2 text embeddings are used as supplied"})
     (output_dir / "run_config.json").write_text(json.dumps(config, ensure_ascii=False, indent=2), encoding="utf-8")
+    (output_dir / "input_data_summary.json").write_text(json.dumps({"feature_sha256": config["feature_sha256"], "splits": {"train": bundle_summary(train), "valid": bundle_summary(valid), "test": bundle_summary(test)}}, ensure_ascii=False, indent=2), encoding="utf-8")
     np.savez(output_dir / "train_standardizer.npz", **{f"{m}_mean": stats[m][0] for m in stats}, **{f"{m}_std": stats[m][1] for m in stats})
     history = []
     best = float("inf")
     best_state = None
+    total_optimizer_steps = 0
+    print(f"[q3] device={device} feature={feature_path.name} sha256={config['feature_sha256'][:16]}...", flush=True)
+    print(f"[q3] samples train={len(train_ds)} valid={len(valid_ds)} test={len(test_ds)} batches_per_epoch={len(train_loader)}", flush=True)
+    class_weights = None
+    if args.class_weighted:
+        counts = np.bincount(train.classification.astype(np.int64), minlength=3).astype(np.float32)
+        class_weights = torch.tensor(len(train.classification) / (3.0 * np.maximum(counts, 1.0)), dtype=torch.float32, device=device)
+        print(f"[q3] class_weights={class_weights.detach().cpu().numpy().round(6).tolist()} (fit on train only)", flush=True)
+    print(f"[q3] starting training: epochs={args.epochs} batch_size={args.batch_size} cls_weight={args.cls_weight} reg_weight={args.reg_weight}", flush=True)
     for epoch in range(1, args.epochs + 1):
-        train_loss = run_epoch(model, train_loader, device, optimizer)
-        valid_loss = run_epoch(model, valid_loader, device)
-        history.append({"epoch": epoch, "train_loss": train_loss, "valid_loss": valid_loss})
+        epoch_start = time.perf_counter()
+        train_loss, train_batches, optimizer_steps = run_epoch(model, train_loader, device, optimizer, args.cls_weight, args.reg_weight, class_weights)
+        valid_loss, valid_batches, _ = run_epoch(model, valid_loader, device, None, args.cls_weight, args.reg_weight, class_weights)
+        total_optimizer_steps += optimizer_steps
+        epoch_seconds = time.perf_counter() - epoch_start
+        parameter_norm = parameter_l2_norm(model)
+        history.append({"epoch": epoch, "train_loss": train_loss, "valid_loss": valid_loss, "train_batches": train_batches, "valid_batches": valid_batches, "optimizer_steps": optimizer_steps, "epoch_seconds": epoch_seconds, "parameter_l2_norm": parameter_norm})
+        print(f"[q3] epoch {epoch:03d}/{args.epochs} train_loss={train_loss:.6f} valid_loss={valid_loss:.6f} steps={optimizer_steps} param_l2={parameter_norm:.4f} time={epoch_seconds:.1f}s", flush=True)
         if valid_loss < best:
             best = valid_loss
             best_state = {k: v.detach().cpu().clone() for k, v in model.state_dict().items()}
@@ -185,7 +344,7 @@ def main(args: argparse.Namespace) -> None:
         raise RuntimeError("没有得到模型状态")
     model.load_state_dict(best_state)
     torch.save({"state_dict": model.state_dict(), "config": config}, output_dir / "best_model.pt")
-    write_csv(output_dir / "training_log.csv", history, ["epoch", "train_loss", "valid_loss"])
+    write_csv(output_dir / "training_log.csv", history, ["epoch", "train_loss", "valid_loss", "train_batches", "valid_batches", "optimizer_steps", "epoch_seconds", "parameter_l2_norm"])
     valid_pred = predict(model, valid_loader, device)
     test_pred = predict(model, test_loader, device)
     metrics_rows = []
@@ -212,7 +371,7 @@ def main(args: argparse.Namespace) -> None:
         write_csv(output_dir / "predictions_attachment4.csv", rows, list(rows[0]) if rows else ["sample_id"])
         write_csv(output_dir / "evidence_mapping_attachment4.csv", mappings, list(mappings[0]) if mappings else ["sample_id"])
     write_run_audit(output_dir, train, valid, test)
-    summary = {"status": "completed", "best_valid_loss": best, "metrics": metrics_rows, "output_dir": str(output_dir), "explanations_are_model_sensitivity": True, "attachment4_has_no_ground_truth": True}
+    summary = {"status": "completed", "epochs_requested": args.epochs, "epochs_completed": len(history), "total_optimizer_steps": total_optimizer_steps, "best_valid_loss": best, "metrics": metrics_rows, "output_dir": str(output_dir), "explanations_are_model_sensitivity": True, "attachment4_has_no_ground_truth": True}
     (output_dir / "run_summary.json").write_text(json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8")
     print(json.dumps(summary, ensure_ascii=False, indent=2))
 
@@ -284,8 +443,11 @@ def parse_args():
     p.add_argument("--heads", type=int, default=4)
     p.add_argument("--layers", type=int, default=1)
     p.add_argument("--dropout", type=float, default=0.1)
-    p.add_argument("--learning-rate", type=float, default=2e-4)
+    p.add_argument("--learning-rate", type=float, default=2e-5)
     p.add_argument("--weight-decay", type=float, default=1e-4)
+    p.add_argument("--cls-weight", type=float, default=1.0, help="分类损失在双任务损失中的权重")
+    p.add_argument("--reg-weight", type=float, default=1.0, help="回归损失在双任务损失中的权重")
+    p.add_argument("--class-weighted", action="store_true", help="按训练集类别频数启用加权交叉熵")
     p.add_argument("--seed", type=int, default=20260924)
     p.add_argument("--device", default=None)
     p.add_argument("--max-train-samples", type=int, default=None)
@@ -297,6 +459,8 @@ def parse_args():
     p.add_argument("--explain-stride", type=int, default=5)
     p.add_argument("--top-k", type=int, default=3)
     p.add_argument("--run-attachment4", action="store_true")
+    p.add_argument("--checkpoint", default=None, help="已有 best_model.pt；传入后跳过训练，仅进行附件四纯推理")
+    p.add_argument("--standardizer", default=None, help="训练集标准化参数 train_standardizer.npz；默认使用 checkpoint 同目录文件")
     return p.parse_args()
 
 

@@ -10,13 +10,15 @@
 - CMU-MOSEI 相关论文、模型和 GitHub 工程资料分析；
 - 问题一透明基线特征提取和时间对齐脚本；
 - 100 条原始视频的特征、掩码、时间映射、异常清单和典型样本输出；
+- 问题三的 masked Transformer 双任务预测、反事实模态贡献和局部时间证据原型；
+- 问题三的单元测试、训练/验证/测试评估入口，以及附件 4 最终推理入口；
 - 本地论文与源码知识库索引。
 
 当前尚未完成：
 
 - 问题二的局部模态缺失鲁棒预测模型；
-- 问题三的完整预测、解释卡和附件 4 专项推理；
-- 问题二、问题三的正式实验表、消融结果和论文结论。
+- 问题二的可执行鲁棒预测入口；
+- 问题三的系统消融实验、正式实验表和最终论文结论。
 
 未经运行日志、验证集结果或题面核验支持的内容，只能视为候选方案或待确认事项。
 
@@ -36,9 +38,11 @@
 ├── research/                          # 外部资料索引、阅读卡片和 SQLite 检索库
 ├── references/                        # 按需缓存的往届论文资料
 ├── scripts/                           # 可重复运行的脚本入口
-├── src/                               # 预留的可复用核心代码目录
-├── cli/                               # 预留的命令行入口
-├── test/                              # 预留的测试目录
+├── src/                               # 可复用数据、模型、指标和解释逻辑
+│   └── q_3/                            # 问题三核心模块
+├── cli/                               # 命令行运行入口
+│   └── q3_run.py                       # 问题三训练、评估、解释和附件4推理
+├── test/                              # 单元测试
 ├── draft/                             # 草稿材料，不代表最终结论
 └── versions/                          # 项目版本分析和迭代记录
 ```
@@ -89,20 +93,32 @@ conda create -n mcmm-e python=3.11 -y
 conda activate mcmm-e
 
 python -m pip install --upgrade pip
-python -m pip install numpy pandas openpyxl opencv-python matplotlib pymupdf
+python -m pip install numpy==1.26.4 pandas openpyxl opencv-python==4.10.0.84 matplotlib pymupdf
+
+# 问题三需要 PyTorch；下列版本组合已在 Windows + CUDA 11.8 环境验证
+python -m pip install torch==2.0.1+cu118 --index-url https://download.pytorch.org/whl/cu118
+
+# 可选：用于阅读或扩展预训练模型的工具
+python -m pip install transformers
 ```
 
-如果运行 CMU-MOSEI 下的 PyTorch 基线工程，还需要按照本机 CPU/CUDA 版本从 PyTorch 官方渠道安装匹配版本的 `torch`。不要盲目复制不匹配的 CUDA 安装命令；先执行：
+如果本机 CUDA 版本不同，应按照 PyTorch 官方渠道选择匹配版本；不要将 CUDA 11.8 的 wheel 与其他 CUDA 运行时混装。当前项目已验证的环境组合为 Python 3.11.16、NumPy 1.26.4、PyTorch 2.0.1+cu118。安装后执行：
 
 ```powershell
 python -c "import torch; print(torch.__version__); print(torch.cuda.is_available())"
 ```
 
-如需使用 Transformer 预训练模型，再按实际模型和许可安装：
+若输出 `False`，问题三仍可使用 CPU 运行，但训练速度会明显降低。
+
+Windows 下若同时使用 Conda MKL 和 PyTorch wheel，可能出现 `OMP: Error #15`。`cli/q3_run.py` 已在导入 PyTorch 前固定单线程并设置 `KMP_DUPLICATE_LIB_OK=TRUE`，用于兼容当前环境；若直接在其他脚本中先导入 PyTorch，应在导入前执行：
 
 ```powershell
-python -m pip install transformers
+$env:OMP_NUM_THREADS = "1"
+$env:MKL_NUM_THREADS = "1"
+$env:KMP_DUPLICATE_LIB_OK = "TRUE"
 ```
+
+该变量是 Windows 多 OpenMP runtime 的兼容性开关，若改用完全统一的 Conda/PyTorch 安装来源，可去掉它并重新验证运行时。
 
 ### FFmpeg
 
@@ -127,6 +143,7 @@ winget install Gyan.FFmpeg.Shared
 python --version
 python -c "import numpy, pandas, openpyxl, cv2, matplotlib; print('科学计算依赖：ok')"
 python -c "import fitz; print('PyMuPDF：ok')"
+python -c "import torch; print('PyTorch:', torch.__version__, 'CUDA:', torch.cuda.is_available())"
 ffmpeg -version
 ```
 
@@ -206,8 +223,8 @@ E-q/
 ## 建模文档
 
 - [问题一建模](E-q/modeling/q_1.md)：特征提取、公共时间窗、数学定义、特征维度、掩码和验收标准。
-- [问题二建模](E-q/modeling/q_2.md)：当前为空，待实现局部模态缺失鲁棒预测。
-- [问题三建模](E-q/modeling/q_3.md)：当前为空，待实现可解释性情感预测。
+- [问题二建模](E-q/modeling/q_2.md)：局部模态缺失鲁棒预测的设计草稿，当前没有正式 CLI 实现。
+- [问题三建模](E-q/modeling/q_3.md)：掩码感知编码、动态融合、双任务预测、反事实解释和证据映射。
 - [版本分析](versions/v3.md)：问题一版本定位、资料结论和迭代要求。
 
 ## CMU-MOSEI 资料与基线工程
@@ -219,6 +236,215 @@ E-q/
 - `CMU-MOSEI/Multimodal-Sentiment-Analysis/`：包含 MulT 跨模态 Transformer、TFN 风格高阶融合和 CTC 式软对齐代码。
 
 该工程可以作为问题二/三的下游基线参考，但不能直接解决问题一。它读取特定格式的预计算 pickle，没有处理附件 1 原始视频审计、局部缺失 mask、E 题双任务输出和可回溯解释；使用前必须重写数据适配器并核验标签、padding 和有效长度。
+
+## 问题三：训练、预测与可解释性
+
+问题三当前实现由以下模块组成：
+
+| 模块 | 作用 |
+| --- | --- |
+| `src/q_3/data.py` | 读取附件二/附件四、校验字段和形状、训练集标准化、CSV 安全输出 |
+| `src/q_3/model.py` | 三模态独立掩码 Transformer、跨模态交互、动态门控、分类/回归双任务头 |
+| `src/q_3/metrics.py` | Accuracy、macro-F1、MAE、Pearson 指标 |
+| `src/q_3/explain.py` | 模态级反事实遮挡、局部窗口遮挡、证据窗口排序 |
+| `cli/q3_run.py` | 完整训练、验证/测试评估、解释文件和附件四专项推理 |
+| `test/test_q3.py` | 数据标准化、mask、缺失模态、模型输出和解释逻辑测试 |
+
+### 问题三默认训练和评估
+
+在项目根目录执行。默认读取附件二 `aligned_50.pkl`，只用训练集拟合标准化参数；验证集用于模型选择，测试集仅在模型固定后评估：
+
+```powershell
+python cli/q3_run.py
+```
+
+每次运行在 `E-q/q_3_output/<YYYYMMDD_HHMMSS_microseconds>/` 新建目录，不覆盖历史运行。典型运行配置如下：
+
+```powershell
+python cli/q3_run.py `
+  --epochs 20 `
+  --batch-size 64 `
+  --hidden-dim 64 `
+  --heads 4 `
+  --layers 1 `
+  --learning-rate 2e-4 `
+  --weight-decay 1e-4 `
+  --seed 20260924 `
+  --device cuda
+```
+
+CPU 运行时删除 `--device cuda`，或显式指定：
+
+```powershell
+python cli/q3_run.py --epochs 20 --device cpu
+```
+
+### 问题三冒烟测试
+
+先用少量样本确认依赖、数据路径、模型前向和输出目录均正常：
+
+```powershell
+python cli/q3_run.py `
+  --epochs 1 `
+  --max-train-samples 64 `
+  --max-valid-samples 32 `
+  --max-test-samples 32 `
+  --explain-max-samples 4 `
+  --seed 20260924 `
+  --device cpu
+```
+
+### 问题三附件四最终推理
+
+附件四无标签，只能在模型已经由附件二训练、验证和固定后进行最终推理，不能参与训练、调参或性能统计：
+
+```powershell
+python cli/q3_run.py `
+  --epochs 20 `
+  --run-attachment4 `
+  --explain-max-samples 32 `
+  --seed 20260924 `
+  --device cuda
+```
+
+该运行目录中的 `predictions_attachment4.csv` 和 `evidence_mapping_attachment4.csv` 只能解释为专项预测与证据映射，不能计算或声称 Accuracy、F1、MAE、Pearson 等真实性能。
+
+### 使用已有权重对附件四纯推理
+
+如果已经完成训练并得到 `best_model.pt`，不需要再次设置或执行训练 epoch。传入 `--checkpoint` 后，程序会跳过附件二训练、验证和测试，只加载已有权重及其训练阶段生成的 `train_standardizer.npz`，然后对附件四进行预测和反事实解释：
+
+```powershell
+python cli/q3_run.py `
+  --checkpoint E-q/q_3_output/20260925_085922_070518300/best_model.pt `
+  --run-attachment4 `
+  --explain-batch-size 8 `
+  --explain-window 5 `
+  --explain-stride 5 `
+  --top-k 3 `
+  --seed 20260924 `
+  --device cuda
+```
+
+默认从 `best_model.pt` 同目录读取 `train_standardizer.npz`。如果标准化文件不在同目录，可显式指定：
+
+```powershell
+python cli/q3_run.py `
+  --checkpoint path/to/best_model.pt `
+  --standardizer path/to/train_standardizer.npz `
+  --run-attachment4 `
+  --device cuda
+```
+
+纯推理模式的运行摘要会明确记录 `epochs_requested=0`、`epochs_completed=0`、`optimizer_steps=0`，且不会生成 `training_log.csv` 或 `model_metrics.csv`。附件四没有真实标签，因此只能输出 `predictions_attachment4.csv` 和 `evidence_mapping_attachment4.csv`，不能报告真实性能指标。
+
+### 问题三参数说明
+
+`--feature-version` 当前仅支持 `aligned`；`unaligned` 不能直接复用当前跨模态时间解释接口。`--explain-window` 和 `--explain-stride` 分别控制局部遮挡窗口长度和步长，默认均为 5；`--top-k` 控制每个模态最多保留的证据窗口数量，默认 3；`--explain-max-samples 0` 可关闭验证集解释输出。完整参数可查看：
+
+```powershell
+python cli/q3_run.py --help
+```
+
+### 问题三当前调优配置
+
+基线模型在 20 轮训练中第 3 轮验证损失最低，之后训练损失继续下降而验证损失上升，存在过拟合；同时多数类 `2` 的预测比例偏高，验证集类别 `1` 召回率偏低。当前代码支持仅使用训练集类别频数计算加权交叉熵：
+
+```powershell
+python cli/q3_run.py `
+  --epochs 8 `
+  --batch-size 64 `
+  --hidden-dim 64 `
+  --heads 4 `
+  --layers 1 `
+  --learning-rate 2e-4 `
+  --weight-decay 1e-4 `
+  --class-weighted `
+  --cls-weight 1.0 `
+  --reg-weight 1.0 `
+  --seed 20260924 `
+  --device cuda
+```
+
+已完成验证集调优实验：加权配置的验证集 Macro-F1 为 `0.5919`，类别 `1` 召回率约 `0.5815`；原基线 Macro-F1 为 `0.5538`，类别 `1` 召回率约 `0.2391`。加权配置验证集 Accuracy 为 `0.5989`，低于基线 `0.6126`，因此它代表“类别均衡优先”的候选方案，不应宣称所有指标均提升。调参只依据验证集，测试集仅在配置固定后作一次报告。
+
+该候选权重已保存于：
+
+```text
+E-q/q_3_output/20260925_092027_593015300/best_model.pt
+```
+
+并已使用该权重完成附件四纯推理：
+
+```text
+E-q/q_3_output/20260925_092205_502758600/
+```
+
+后续论文应同时报告原基线和加权候选，至少比较 Accuracy、Macro-F1、各类别召回率、MAE 和 Pearson，不能只保留对某一个指标最有利的配置。
+
+问题三每次运行主要生成：
+
+| 文件 | 说明 |
+| --- | --- |
+| `run_config.json` | 数据路径哈希、维度、超参数、随机种子、设备和数据边界 |
+| `train_standardizer.npz` | 仅由训练集拟合的三模态均值和标准差 |
+| `best_model.pt` | 验证损失最优模型参数 |
+| `training_log.csv` | 每轮训练/验证损失 |
+| `predictions_valid.csv`、`predictions_test.csv` | 分类、回归预测、真实标签和内部门控值 |
+| `model_metrics.csv` | Accuracy、macro-F1、MAE、Pearson |
+| `explanations_valid.csv` | 模态反事实影响、归一化贡献、主模态和忠实性诊断 |
+| `evidence_mapping_valid.csv` | 局部证据窗口到相对时间、帧区间和文本证据的映射 |
+| `predictions_attachment4.csv` | 附件四专项预测与解释信息，无真实标签 |
+| `evidence_mapping_attachment4.csv` | 附件四证据映射 |
+| `validation_audit.json`、`anomalies.csv` | 数据边界、字段、有限值和异常审计 |
+| `output_checksums.json`、`run_summary.json` | 输出哈希和运行摘要 |
+
+内部门控值仅是模型融合参数；论文中的模态贡献应使用反事实遮挡结果，不应把门控值直接当作因果贡献。
+
+### 问题二当前状态
+
+问题二建模文档已完成方案设计，但当前仓库没有 `cli/q2_run.py` 或可确认的训练脚本。因此不能使用不存在的命令执行问题二训练或预测。实现时应继续遵守附件二 train/valid/test 边界，并将每次结果写入 `E-q/q_2_output/<时间戳>/`。
+
+## 测试与代码检查
+
+运行全部当前单元测试：
+
+```powershell
+python -m unittest discover -s test -p "test_*.py" -v
+```
+
+只运行问题三测试（当前 `test/` 为目录而非 Python package）：
+
+```powershell
+python -m unittest discover -s test -p "test_q3.py" -v
+```
+
+检查问题一和问题三入口语法：
+
+```powershell
+python -m py_compile scripts/q1_extract_features.py cli/q3_run.py
+```
+
+测试重点包括：输入维度和字段、训练集标准化、padding mask、整模态缺失时的有限输出、标签范围、预测指标和反事实解释输出。正式实验前仍需人工检查数据切分、结果表和解释窗口是否与原始素材语义一致。
+
+## 论文与 LaTeX 编译
+
+问题三正文草稿为 `draft/q_3.md`，其 LaTeX 首版位于 `draft/q_3/`：
+
+```powershell
+$markdown = (Get-Content -Raw -Encoding utf8 draft/q_3.md).Replace('\[', '$$').Replace('\]', '$$')
+$markdown | pandoc --from markdown+tex_math_dollars+raw_tex `
+  --to latex --standalone --top-level-division=section `
+  -V documentclass=ctexart `
+  -V papersize=a4 -V fontsize=12pt -V geometry:margin=2.5cm `
+  -V linestretch=1.5 -o draft/q_3/q_3.tex
+
+xelatex -interaction=nonstopmode -halt-on-error `
+  -output-directory=draft/q_3 draft/q_3/q_3.tex
+xelatex -interaction=nonstopmode -halt-on-error `
+  -output-directory=draft/q_3 draft/q_3/q_3.tex
+```
+
+编译结果为 `draft/q_3/q_3.pdf`；修改正文后应重新生成 TeX 并至少编译两次，以更新目录、交叉引用和长表格宽度。论文草稿中的实验数字必须来自对应输出目录，附件四只能写预测和解释，不能写无标签性能。
 
 ## 资料知识库
 

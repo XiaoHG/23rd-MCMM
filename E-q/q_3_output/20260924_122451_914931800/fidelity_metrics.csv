@@ -1,2 +1,0 @@
-﻿split,sample_count,mean_top_evidence_impact,mean_low_evidence_impact,diagnostic
-valid,32,0.047125167126068845,0.002478486065835265,top-vs-low local occlusion impact; not causal truth

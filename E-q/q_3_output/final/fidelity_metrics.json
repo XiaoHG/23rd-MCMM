@@ -1,0 +1,24 @@
+{
+  "selection": {
+    "baseline": "train_mean",
+    "window": 7,
+    "stride": 7,
+    "sample_count": 728,
+    "mean_top_impact": 0.07485291513958911,
+    "mean_low_impact": 0.0032877145976848354,
+    "top_minus_low": 0.07156520054190428,
+    "top_to_low_ratio": 22.76746138253592
+  },
+  "final_config": {
+    "baseline": "train_mean",
+    "window": 7,
+    "stride": 7,
+    "top_k": 3
+  },
+  "valid": {
+    "sample_count": 728,
+    "mean_top_evidence_impact": 0.07485291513958911,
+    "mean_low_evidence_impact": 0.0032877145976848354,
+    "top_minus_low": 0.07156520054190428
+  }
+}

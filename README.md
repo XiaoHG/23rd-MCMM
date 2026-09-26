@@ -381,6 +381,22 @@ E-q/q_3_output/20260925_092205_502758600/
 
 后续论文应同时报告原基线和加权候选，至少比较 Accuracy、Macro-F1、各类别召回率、MAE 和 Pearson，不能只保留对某一个指标最有利的配置。
 
+### 问题三可解释性完成流程
+
+在已有完整训练目录上运行以下命令，可对完整验证集比较遮挡基线和窗口，并对附件四视频生成 OpenCV 解码审计、关键帧和样本解释卡：
+
+```powershell
+python scripts/q3_complete_explainability.py `
+  --run-dir E-q/q_3_output/20260925_100021_726334600 `
+  --valid-max-samples 0 `
+  --batch-size 32 `
+  --device cuda
+```
+
+输出会写入新的 `E-q/q_3_output/<时间戳>/`，包括参数选择表、视频解码审计、异常记录、关键帧、解释卡、运行配置和来源哈希。脚本不训练模型、不使用附件四标签，也不修改源运行目录或原始视频。
+
+`keyframes/` 和 `evidence_cards/` 中的图片均保留原始视频画面，不叠加文字；对应参数分别存储在 `keyframes/keyframes.json` 和 `evidence_cards/evidence_cards.json` 中，JSON 的键就是图片文件名。
+
 问题三每次运行主要生成：
 
 | 文件 | 说明 |

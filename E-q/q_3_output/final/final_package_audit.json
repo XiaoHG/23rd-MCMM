@@ -1,0 +1,29 @@
+{
+  "schema_version": "q3-v7-final-package-v1",
+  "source_dir": "D:\\MCMM\\23rd-MCMM\\E-q\\q_3_output\\20260925_213047_006377600",
+  "base_audit_passed": true,
+  "selected_explanation": {
+    "baseline": "train_mean",
+    "window": 7,
+    "stride": 7,
+    "sample_count": 728,
+    "mean_top_impact": 0.07485291513958911,
+    "mean_low_impact": 0.0032877145976848354,
+    "top_minus_low": 0.07156520054190428,
+    "top_to_low_ratio": 22.76746138253592
+  },
+  "attachment4_prediction_count": 20,
+  "attachment4_sample_ids_unique": true,
+  "keyframe_count": 60,
+  "keyframe_metadata_count": 60,
+  "card_count": 20,
+  "card_metadata_count": 20,
+  "keyframe_files_match_json": true,
+  "card_files_match_json": true,
+  "all_cards_have_three_or_fewer_component_frames": true,
+  "model_artifacts_present": true,
+  "video_decode_mismatch_count": 16,
+  "attachment4_is_inference_only": true,
+  "impact_score_semantics": "model_sensitivity_not_causal_truth",
+  "passed": true
+}

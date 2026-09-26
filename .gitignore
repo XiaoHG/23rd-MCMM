@@ -22,7 +22,6 @@ research/sources/
 research/library.db
 research/library.db-*
 references/*
-!references/README.md
 *.tmp
 *.log
 
@@ -49,7 +48,6 @@ E-q/dataset/*
 .idea/
 processing/
 CMU-MOSEI/*.zip
-CMU-MOSEI/**/*.pdf
 CMU-MOSEI/Multimodal-Sentiment-Analysis/
 E-q/*.zip
 E-q/*.docx

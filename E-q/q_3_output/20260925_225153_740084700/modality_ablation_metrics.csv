@@ -1,0 +1,9 @@
+﻿split,removed_modality,accuracy,macro_f1,mae,pearson,interpretation
+valid,none,0.6071428571428571,0.5475654423938315,0.6520967400475446,0.5809933518636595,post-hoc modality removal; not a retrained single-modality baseline
+valid,text,0.28708791208791207,0.2637640224658176,0.869412778834985,-0.02069874629582619,post-hoc modality removal; not a retrained single-modality baseline
+valid,audio,0.6043956043956044,0.5716874371804319,0.7166553049976426,0.5796884767430903,post-hoc modality removal; not a retrained single-modality baseline
+valid,vision,0.6291208791208791,0.5761990785876776,0.6942558143182995,0.5739305990925385,post-hoc modality removal; not a retrained single-modality baseline
+test,none,0.672627235213205,0.5950226323536837,0.6794127894460097,0.6259110738559953,post-hoc modality removal; not a retrained single-modality baseline
+test,text,0.28885832187070154,0.26698046867548675,0.9892218803895312,-0.06482140661616223,post-hoc modality removal; not a retrained single-modality baseline
+test,audio,0.6781292984869326,0.6253657006833765,0.7333679252212542,0.6382423593802432,post-hoc modality removal; not a retrained single-modality baseline
+test,vision,0.672627235213205,0.5926375144756945,0.7259853954335349,0.6131386962446789,post-hoc modality removal; not a retrained single-modality baseline

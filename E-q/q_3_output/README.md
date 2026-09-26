@@ -376,3 +376,16 @@ Get-Content (Join-Path $latest.FullName 'run_summary.json')
 ```
 
 人工复核附件四解释时，依据 `evidence_mapping_attachment4.csv` 的 `source_video` 打开视频，跳转到 `start_sec` 至 `end_sec`，并结合 `text_evidence`、`impact_score` 以及 `predictions_attachment4.csv` 的模态贡献判断。论文中应表述为模型预测证据或敏感片段，而不是未经人工标注验证的真实情感原因。
+
+## 八、视频级解释完成材料
+
+使用 `scripts/q3_complete_explainability.py` 可在完整验证集上比较 `zero_invalid` 与 `train_mean` 遮挡基线、窗口长度 3/5/7，并读取附件四 MP4 生成 `keyframes/` 和 `evidence_cards/`。每次运行新建时间戳目录，另含 `video_decode_audit.csv`、`anomalies.csv`、`explanation_summary.csv`、`run_config.json`、`source_manifest.json` 和递归输出校验。
+
+OpenCV 容器帧数与实际解码帧数不一致时，关键帧会截断到实际可解码范围，并在 `anomalies.csv` 中记录请求帧号和实际使用帧号；不能把截断后的画面描述为原始映射完全准确。
+
+`keyframes/` 和 `evidence_cards/` 内的图片不再绘制标签或参数，保证视频帧内容完整。`keyframes/keyframes.json` 以关键帧文件名为键，记录模态、rank、影响分数、时间区间、请求帧号、实际使用帧号、源视频和文本证据；`evidence_cards/evidence_cards.json` 以解释卡文件名为键，记录预测结果、主导模态、组成关键帧和各模态证据参数。两个 JSON 与各自目录内的图片文件一一对应。
+## v7 最终论文支撑包
+
+`20260925_213047_006377600` 是统一预测与审计源目录；包含关键帧、解释卡、模型权重和论文图表的完整归档为 `20260925_215043_145160100`。该目录由 `scripts/q3_v7_package.py` 从源目录复制后生成，确保预测、证据映射、关键帧和解释卡来自同一 checkpoint 与解释配置。
+
+完整归档必须同时检查 `final_package_audit.json`（应为 `passed=true`）、`package_manifest.json`、`keyframes/keyframes.json`、`evidence_cards/evidence_cards.json` 和 `output_checksums.json`。当前归档包含 20 条附件四预测、60 张原始关键帧和 20 张解释卡；附件四仍然只用于推理和证据展示，不用于训练、调参或真实性能统计。

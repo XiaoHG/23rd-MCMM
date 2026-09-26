@@ -1,0 +1,1042 @@
+{
+  "01.png": {
+    "sample_id": "01",
+    "pred_class": 2,
+    "pred_regression": 0.641072154045105,
+    "main_modality": "text",
+    "explanation_method": "counterfactual_occlusion",
+    "source_video": "D:\\MCMM\\23rd-MCMM\\E-q\\dataset\\attachment_4_explainability_videos_and_features\\attachment_4_explainability_videos_and_features\\aligned\\videos\\01.mp4",
+    "component_keyframes": [
+      "01_text_rank1.jpg",
+      "01_audio_rank1.jpg",
+      "01_vision_rank1.jpg"
+    ],
+    "evidence": [
+      {
+        "modality": "text",
+        "rank": 1,
+        "impact_score": 0.04781545326113701,
+        "start_index": 14,
+        "end_index": 20,
+        "start_sec": 2.52,
+        "end_sec": 3.78,
+        "frame_start": 75,
+        "frame_end": 112,
+        "mapping_status": "mapped_to_video"
+      },
+      {
+        "modality": "audio",
+        "rank": 1,
+        "impact_score": 0.03018074296414852,
+        "start_index": 7,
+        "end_index": 13,
+        "start_sec": 1.26,
+        "end_sec": 2.52,
+        "frame_start": 37,
+        "frame_end": 74,
+        "mapping_status": "mapped_to_video"
+      },
+      {
+        "modality": "vision",
+        "rank": 1,
+        "impact_score": 0.014346946962177753,
+        "start_index": 42,
+        "end_index": 48,
+        "start_sec": 7.56,
+        "end_sec": 8.82,
+        "frame_start": 226,
+        "frame_end": 263,
+        "mapping_status": "mapped_to_video"
+      }
+    ],
+    "frame_content": "original_decoded_frames_without_overlay"
+  },
+  "02.png": {
+    "sample_id": "02",
+    "pred_class": 0,
+    "pred_regression": -0.08670832961797714,
+    "main_modality": "audio",
+    "explanation_method": "counterfactual_occlusion",
+    "source_video": "D:\\MCMM\\23rd-MCMM\\E-q\\dataset\\attachment_4_explainability_videos_and_features\\attachment_4_explainability_videos_and_features\\aligned\\videos\\02.mp4",
+    "component_keyframes": [
+      "02_text_rank1.jpg",
+      "02_audio_rank1.jpg",
+      "02_vision_rank1.jpg"
+    ],
+    "evidence": [
+      {
+        "modality": "text",
+        "rank": 1,
+        "impact_score": 0.09741479158401489,
+        "start_index": 7,
+        "end_index": 13,
+        "start_sec": 0.4713333333333333,
+        "end_sec": 0.9426666666666667,
+        "frame_start": 14,
+        "frame_end": 27,
+        "mapping_status": "mapped_to_video"
+      },
+      {
+        "modality": "audio",
+        "rank": 1,
+        "impact_score": 0.04621479660272598,
+        "start_index": 21,
+        "end_index": 27,
+        "start_sec": 1.4140000000000001,
+        "end_sec": 1.8853333333333333,
+        "frame_start": 42,
+        "frame_end": 55,
+        "mapping_status": "mapped_to_video"
+      },
+      {
+        "modality": "vision",
+        "rank": 1,
+        "impact_score": 0.054168589413166046,
+        "start_index": 7,
+        "end_index": 13,
+        "start_sec": 0.4713333333333333,
+        "end_sec": 0.9426666666666667,
+        "frame_start": 14,
+        "frame_end": 27,
+        "mapping_status": "mapped_to_video"
+      }
+    ],
+    "frame_content": "original_decoded_frames_without_overlay"
+  },
+  "03.png": {
+    "sample_id": "03",
+    "pred_class": 0,
+    "pred_regression": 0.05032320320606232,
+    "main_modality": "audio",
+    "explanation_method": "counterfactual_occlusion",
+    "source_video": "D:\\MCMM\\23rd-MCMM\\E-q\\dataset\\attachment_4_explainability_videos_and_features\\attachment_4_explainability_videos_and_features\\aligned\\videos\\03.mp4",
+    "component_keyframes": [
+      "03_text_rank1.jpg",
+      "03_audio_rank1.jpg",
+      "03_vision_rank1.jpg"
+    ],
+    "evidence": [
+      {
+        "modality": "text",
+        "rank": 1,
+        "impact_score": 0.12385858595371246,
+        "start_index": 14,
+        "end_index": 20,
+        "start_sec": 2.6973333333333334,
+        "end_sec": 4.045999999999999,
+        "frame_start": 80,
+        "frame_end": 120,
+        "mapping_status": "mapped_to_video"
+      },
+      {
+        "modality": "audio",
+        "rank": 1,
+        "impact_score": 0.07096828520298004,
+        "start_index": 35,
+        "end_index": 41,
+        "start_sec": 6.743333333333332,
+        "end_sec": 8.091999999999999,
+        "frame_start": 202,
+        "frame_end": 241,
+        "mapping_status": "mapped_to_video"
+      },
+      {
+        "modality": "vision",
+        "rank": 1,
+        "impact_score": 0.039951857179403305,
+        "start_index": 7,
+        "end_index": 13,
+        "start_sec": 1.3486666666666667,
+        "end_sec": 2.6973333333333334,
+        "frame_start": 40,
+        "frame_end": 79,
+        "mapping_status": "mapped_to_video"
+      }
+    ],
+    "frame_content": "original_decoded_frames_without_overlay"
+  },
+  "04.png": {
+    "sample_id": "04",
+    "pred_class": 1,
+    "pred_regression": 0.3423542380332947,
+    "main_modality": "audio",
+    "explanation_method": "counterfactual_occlusion",
+    "source_video": "D:\\MCMM\\23rd-MCMM\\E-q\\dataset\\attachment_4_explainability_videos_and_features\\attachment_4_explainability_videos_and_features\\aligned\\videos\\04.mp4",
+    "component_keyframes": [
+      "04_text_rank1.jpg",
+      "04_audio_rank1.jpg",
+      "04_vision_rank1.jpg"
+    ],
+    "evidence": [
+      {
+        "modality": "text",
+        "rank": 1,
+        "impact_score": 0.1243135929107666,
+        "start_index": 14,
+        "end_index": 20,
+        "start_sec": 1.9320000000000002,
+        "end_sec": 2.898,
+        "frame_start": 57,
+        "frame_end": 85,
+        "mapping_status": "mapped_to_video"
+      },
+      {
+        "modality": "audio",
+        "rank": 1,
+        "impact_score": 0.06529708951711655,
+        "start_index": 0,
+        "end_index": 6,
+        "start_sec": 0.0,
+        "end_sec": 0.9660000000000001,
+        "frame_start": 0,
+        "frame_end": 27,
+        "mapping_status": "mapped_to_video"
+      },
+      {
+        "modality": "vision",
+        "rank": 1,
+        "impact_score": 0.04042116180062294,
+        "start_index": 0,
+        "end_index": 6,
+        "start_sec": 0.0,
+        "end_sec": 0.9660000000000001,
+        "frame_start": 0,
+        "frame_end": 27,
+        "mapping_status": "mapped_to_video"
+      }
+    ],
+    "frame_content": "original_decoded_frames_without_overlay"
+  },
+  "05.png": {
+    "sample_id": "05",
+    "pred_class": 2,
+    "pred_regression": 0.48795145750045776,
+    "main_modality": "text",
+    "explanation_method": "counterfactual_occlusion",
+    "source_video": "D:\\MCMM\\23rd-MCMM\\E-q\\dataset\\attachment_4_explainability_videos_and_features\\attachment_4_explainability_videos_and_features\\aligned\\videos\\05.mp4",
+    "component_keyframes": [
+      "05_text_rank1.jpg",
+      "05_audio_rank1.jpg",
+      "05_vision_rank1.jpg"
+    ],
+    "evidence": [
+      {
+        "modality": "text",
+        "rank": 1,
+        "impact_score": 0.04256496950984001,
+        "start_index": 7,
+        "end_index": 13,
+        "start_sec": 0.8539999999999999,
+        "end_sec": 1.7079999999999997,
+        "frame_start": 25,
+        "frame_end": 50,
+        "mapping_status": "mapped_to_video"
+      },
+      {
+        "modality": "audio",
+        "rank": 1,
+        "impact_score": 0.014302162453532219,
+        "start_index": 28,
+        "end_index": 34,
+        "start_sec": 3.4159999999999995,
+        "end_sec": 4.27,
+        "frame_start": 102,
+        "frame_end": 127,
+        "mapping_status": "mapped_to_video"
+      },
+      {
+        "modality": "vision",
+        "rank": 1,
+        "impact_score": 0.03220578283071518,
+        "start_index": 0,
+        "end_index": 6,
+        "start_sec": 0.0,
+        "end_sec": 0.8539999999999999,
+        "frame_start": 0,
+        "frame_end": 24,
+        "mapping_status": "mapped_to_video"
+      }
+    ],
+    "frame_content": "original_decoded_frames_without_overlay"
+  },
+  "06.png": {
+    "sample_id": "06",
+    "pred_class": 2,
+    "pred_regression": 0.540617823600769,
+    "main_modality": "text",
+    "explanation_method": "counterfactual_occlusion",
+    "source_video": "D:\\MCMM\\23rd-MCMM\\E-q\\dataset\\attachment_4_explainability_videos_and_features\\attachment_4_explainability_videos_and_features\\aligned\\videos\\06.mp4",
+    "component_keyframes": [
+      "06_text_rank1.jpg",
+      "06_audio_rank1.jpg",
+      "06_vision_rank1.jpg"
+    ],
+    "evidence": [
+      {
+        "modality": "text",
+        "rank": 1,
+        "impact_score": 0.051431804895401,
+        "start_index": 0,
+        "end_index": 6,
+        "start_sec": 0.0,
+        "end_sec": 1.1526666666666665,
+        "frame_start": 0,
+        "frame_end": 33,
+        "mapping_status": "mapped_to_video"
+      },
+      {
+        "modality": "audio",
+        "rank": 1,
+        "impact_score": 0.0380190871655941,
+        "start_index": 42,
+        "end_index": 48,
+        "start_sec": 6.9159999999999995,
+        "end_sec": 8.068666666666665,
+        "frame_start": 207,
+        "frame_end": 241,
+        "mapping_status": "mapped_to_video"
+      },
+      {
+        "modality": "vision",
+        "rank": 1,
+        "impact_score": 0.032821860164403915,
+        "start_index": 28,
+        "end_index": 34,
+        "start_sec": 4.610666666666666,
+        "end_sec": 5.763333333333333,
+        "frame_start": 138,
+        "frame_end": 171,
+        "mapping_status": "mapped_to_video"
+      }
+    ],
+    "frame_content": "original_decoded_frames_without_overlay"
+  },
+  "07.png": {
+    "sample_id": "07",
+    "pred_class": 2,
+    "pred_regression": 1.1184756755828857,
+    "main_modality": "text",
+    "explanation_method": "counterfactual_occlusion",
+    "source_video": "D:\\MCMM\\23rd-MCMM\\E-q\\dataset\\attachment_4_explainability_videos_and_features\\attachment_4_explainability_videos_and_features\\aligned\\videos\\07.mp4",
+    "component_keyframes": [
+      "07_text_rank1.jpg",
+      "07_audio_rank1.jpg",
+      "07_vision_rank1.jpg"
+    ],
+    "evidence": [
+      {
+        "modality": "text",
+        "rank": 1,
+        "impact_score": 0.08272730559110641,
+        "start_index": 0,
+        "end_index": 6,
+        "start_sec": 0.0,
+        "end_sec": 2.9819999999999998,
+        "frame_start": 0,
+        "frame_end": 88,
+        "mapping_status": "mapped_to_video"
+      },
+      {
+        "modality": "audio",
+        "rank": 1,
+        "impact_score": 0.05772298946976662,
+        "start_index": 7,
+        "end_index": 13,
+        "start_sec": 2.9819999999999998,
+        "end_sec": 5.9639999999999995,
+        "frame_start": 89,
+        "frame_end": 177,
+        "mapping_status": "mapped_to_video"
+      },
+      {
+        "modality": "vision",
+        "rank": 1,
+        "impact_score": 0.050748590379953384,
+        "start_index": 7,
+        "end_index": 13,
+        "start_sec": 2.9819999999999998,
+        "end_sec": 5.9639999999999995,
+        "frame_start": 89,
+        "frame_end": 177,
+        "mapping_status": "mapped_to_video"
+      }
+    ],
+    "frame_content": "original_decoded_frames_without_overlay"
+  },
+  "08.png": {
+    "sample_id": "08",
+    "pred_class": 2,
+    "pred_regression": 0.8715217113494873,
+    "main_modality": "text",
+    "explanation_method": "counterfactual_occlusion",
+    "source_video": "D:\\MCMM\\23rd-MCMM\\E-q\\dataset\\attachment_4_explainability_videos_and_features\\attachment_4_explainability_videos_and_features\\aligned\\videos\\08.mp4",
+    "component_keyframes": [
+      "08_text_rank1.jpg",
+      "08_audio_rank1.jpg",
+      "08_vision_rank1.jpg"
+    ],
+    "evidence": [
+      {
+        "modality": "text",
+        "rank": 1,
+        "impact_score": 0.0522899404168129,
+        "start_index": 0,
+        "end_index": 6,
+        "start_sec": 0.0,
+        "end_sec": 0.6953333333333334,
+        "frame_start": 0,
+        "frame_end": 19,
+        "mapping_status": "mapped_to_video"
+      },
+      {
+        "modality": "audio",
+        "rank": 1,
+        "impact_score": 0.03339243680238724,
+        "start_index": 21,
+        "end_index": 27,
+        "start_sec": 2.086,
+        "end_sec": 2.7813333333333334,
+        "frame_start": 62,
+        "frame_end": 82,
+        "mapping_status": "mapped_to_video"
+      },
+      {
+        "modality": "vision",
+        "rank": 1,
+        "impact_score": 0.06263332813978195,
+        "start_index": 42,
+        "end_index": 48,
+        "start_sec": 4.172,
+        "end_sec": 4.867333333333334,
+        "frame_start": 125,
+        "frame_end": 145,
+        "mapping_status": "mapped_to_video"
+      }
+    ],
+    "frame_content": "original_decoded_frames_without_overlay"
+  },
+  "09.png": {
+    "sample_id": "09",
+    "pred_class": 0,
+    "pred_regression": -1.9808928966522217,
+    "main_modality": "text",
+    "explanation_method": "counterfactual_occlusion",
+    "source_video": "D:\\MCMM\\23rd-MCMM\\E-q\\dataset\\attachment_4_explainability_videos_and_features\\attachment_4_explainability_videos_and_features\\aligned\\videos\\09.mp4",
+    "component_keyframes": [
+      "09_text_rank1.jpg",
+      "09_audio_rank1.jpg",
+      "09_vision_rank1.jpg"
+    ],
+    "evidence": [
+      {
+        "modality": "text",
+        "rank": 1,
+        "impact_score": 0.12809094786643982,
+        "start_index": 42,
+        "end_index": 48,
+        "start_sec": 4.228,
+        "end_sec": 4.932666666666666,
+        "frame_start": 126,
+        "frame_end": 146,
+        "mapping_status": "mapped_to_video"
+      },
+      {
+        "modality": "audio",
+        "rank": 1,
+        "impact_score": 0.067410409450531,
+        "start_index": 0,
+        "end_index": 6,
+        "start_sec": 0.0,
+        "end_sec": 0.7046666666666667,
+        "frame_start": 0,
+        "frame_end": 20,
+        "mapping_status": "mapped_to_video"
+      },
+      {
+        "modality": "vision",
+        "rank": 1,
+        "impact_score": 0.05258867144584656,
+        "start_index": 7,
+        "end_index": 13,
+        "start_sec": 0.7046666666666667,
+        "end_sec": 1.4093333333333333,
+        "frame_start": 21,
+        "frame_end": 41,
+        "mapping_status": "mapped_to_video"
+      }
+    ],
+    "frame_content": "original_decoded_frames_without_overlay"
+  },
+  "10.png": {
+    "sample_id": "10",
+    "pred_class": 0,
+    "pred_regression": -0.7356126308441162,
+    "main_modality": "text",
+    "explanation_method": "counterfactual_occlusion",
+    "source_video": "D:\\MCMM\\23rd-MCMM\\E-q\\dataset\\attachment_4_explainability_videos_and_features\\attachment_4_explainability_videos_and_features\\aligned\\videos\\10.mp4",
+    "component_keyframes": [
+      "10_text_rank1.jpg",
+      "10_audio_rank1.jpg",
+      "10_vision_rank1.jpg"
+    ],
+    "evidence": [
+      {
+        "modality": "text",
+        "rank": 1,
+        "impact_score": 0.20638437569141388,
+        "start_index": 35,
+        "end_index": 41,
+        "start_sec": 6.883333333333334,
+        "end_sec": 8.26,
+        "frame_start": 206,
+        "frame_end": 246,
+        "mapping_status": "mapped_to_video"
+      },
+      {
+        "modality": "audio",
+        "rank": 1,
+        "impact_score": 0.13549908995628357,
+        "start_index": 21,
+        "end_index": 27,
+        "start_sec": 4.13,
+        "end_sec": 5.506666666666668,
+        "frame_start": 123,
+        "frame_end": 164,
+        "mapping_status": "mapped_to_video"
+      },
+      {
+        "modality": "vision",
+        "rank": 1,
+        "impact_score": 0.09313066303730011,
+        "start_index": 0,
+        "end_index": 6,
+        "start_sec": 0.0,
+        "end_sec": 1.376666666666667,
+        "frame_start": 0,
+        "frame_end": 40,
+        "mapping_status": "mapped_to_video"
+      }
+    ],
+    "frame_content": "original_decoded_frames_without_overlay"
+  },
+  "11.png": {
+    "sample_id": "11",
+    "pred_class": 0,
+    "pred_regression": -1.4799723625183105,
+    "main_modality": "text",
+    "explanation_method": "counterfactual_occlusion",
+    "source_video": "D:\\MCMM\\23rd-MCMM\\E-q\\dataset\\attachment_4_explainability_videos_and_features\\attachment_4_explainability_videos_and_features\\aligned\\videos\\11.mp4",
+    "component_keyframes": [
+      "11_text_rank1.jpg",
+      "11_audio_rank1.jpg",
+      "11_vision_rank1.jpg"
+    ],
+    "evidence": [
+      {
+        "modality": "text",
+        "rank": 1,
+        "impact_score": 0.16469167172908783,
+        "start_index": 14,
+        "end_index": 20,
+        "start_sec": 1.624,
+        "end_sec": 2.436,
+        "frame_start": 48,
+        "frame_end": 72,
+        "mapping_status": "mapped_to_video"
+      },
+      {
+        "modality": "audio",
+        "rank": 1,
+        "impact_score": 0.06199685111641884,
+        "start_index": 14,
+        "end_index": 20,
+        "start_sec": 1.624,
+        "end_sec": 2.436,
+        "frame_start": 48,
+        "frame_end": 72,
+        "mapping_status": "mapped_to_video"
+      },
+      {
+        "modality": "vision",
+        "rank": 1,
+        "impact_score": 0.045919351279735565,
+        "start_index": 7,
+        "end_index": 13,
+        "start_sec": 0.812,
+        "end_sec": 1.624,
+        "frame_start": 24,
+        "frame_end": 47,
+        "mapping_status": "mapped_to_video"
+      }
+    ],
+    "frame_content": "original_decoded_frames_without_overlay"
+  },
+  "12.png": {
+    "sample_id": "12",
+    "pred_class": 0,
+    "pred_regression": -1.3889446258544922,
+    "main_modality": "text",
+    "explanation_method": "counterfactual_occlusion",
+    "source_video": "D:\\MCMM\\23rd-MCMM\\E-q\\dataset\\attachment_4_explainability_videos_and_features\\attachment_4_explainability_videos_and_features\\aligned\\videos\\12.mp4",
+    "component_keyframes": [
+      "12_text_rank1.jpg",
+      "12_audio_rank1.jpg",
+      "12_vision_rank1.jpg"
+    ],
+    "evidence": [
+      {
+        "modality": "text",
+        "rank": 1,
+        "impact_score": 0.12203069031238556,
+        "start_index": 21,
+        "end_index": 27,
+        "start_sec": 5.432,
+        "end_sec": 7.242666666666667,
+        "frame_start": 162,
+        "frame_end": 216,
+        "mapping_status": "mapped_to_video"
+      },
+      {
+        "modality": "audio",
+        "rank": 1,
+        "impact_score": 0.08416296541690826,
+        "start_index": 28,
+        "end_index": 34,
+        "start_sec": 7.242666666666667,
+        "end_sec": 9.053333333333335,
+        "frame_start": 217,
+        "frame_end": 270,
+        "mapping_status": "mapped_to_video"
+      },
+      {
+        "modality": "vision",
+        "rank": 1,
+        "impact_score": 0.028605196624994278,
+        "start_index": 35,
+        "end_index": 41,
+        "start_sec": 9.053333333333335,
+        "end_sec": 10.864,
+        "frame_start": 271,
+        "frame_end": 324,
+        "mapping_status": "mapped_to_video"
+      }
+    ],
+    "frame_content": "original_decoded_frames_without_overlay"
+  },
+  "13.png": {
+    "sample_id": "13",
+    "pred_class": 2,
+    "pred_regression": 0.06048497557640076,
+    "main_modality": "text",
+    "explanation_method": "counterfactual_occlusion",
+    "source_video": "D:\\MCMM\\23rd-MCMM\\E-q\\dataset\\attachment_4_explainability_videos_and_features\\attachment_4_explainability_videos_and_features\\aligned\\videos\\13.mp4",
+    "component_keyframes": [
+      "13_text_rank1.jpg",
+      "13_audio_rank1.jpg",
+      "13_vision_rank1.jpg"
+    ],
+    "evidence": [
+      {
+        "modality": "text",
+        "rank": 1,
+        "impact_score": 0.03214967995882034,
+        "start_index": 7,
+        "end_index": 13,
+        "start_sec": 1.2133333333333334,
+        "end_sec": 2.4266666666666667,
+        "frame_start": 36,
+        "frame_end": 71,
+        "mapping_status": "mapped_to_video"
+      },
+      {
+        "modality": "audio",
+        "rank": 1,
+        "impact_score": 0.0410919226706028,
+        "start_index": 42,
+        "end_index": 48,
+        "start_sec": 7.28,
+        "end_sec": 8.493333333333332,
+        "frame_start": 218,
+        "frame_end": 253,
+        "mapping_status": "mapped_to_video"
+      },
+      {
+        "modality": "vision",
+        "rank": 1,
+        "impact_score": 0.010267427191138268,
+        "start_index": 42,
+        "end_index": 48,
+        "start_sec": 7.28,
+        "end_sec": 8.493333333333332,
+        "frame_start": 218,
+        "frame_end": 253,
+        "mapping_status": "mapped_to_video"
+      }
+    ],
+    "frame_content": "original_decoded_frames_without_overlay"
+  },
+  "14.png": {
+    "sample_id": "14",
+    "pred_class": 2,
+    "pred_regression": 1.0758442878723145,
+    "main_modality": "text",
+    "explanation_method": "counterfactual_occlusion",
+    "source_video": "D:\\MCMM\\23rd-MCMM\\E-q\\dataset\\attachment_4_explainability_videos_and_features\\attachment_4_explainability_videos_and_features\\aligned\\videos\\14.mp4",
+    "component_keyframes": [
+      "14_text_rank1.jpg",
+      "14_audio_rank1.jpg",
+      "14_vision_rank1.jpg"
+    ],
+    "evidence": [
+      {
+        "modality": "text",
+        "rank": 1,
+        "impact_score": 0.03189665824174881,
+        "start_index": 42,
+        "end_index": 48,
+        "start_sec": 8.624,
+        "end_sec": 10.061333333333334,
+        "frame_start": 258,
+        "frame_end": 300,
+        "mapping_status": "mapped_to_video"
+      },
+      {
+        "modality": "audio",
+        "rank": 1,
+        "impact_score": 0.07872754335403442,
+        "start_index": 14,
+        "end_index": 20,
+        "start_sec": 2.874666666666667,
+        "end_sec": 4.312,
+        "frame_start": 86,
+        "frame_end": 128,
+        "mapping_status": "mapped_to_video"
+      },
+      {
+        "modality": "vision",
+        "rank": 1,
+        "impact_score": 0.08429257571697235,
+        "start_index": 14,
+        "end_index": 20,
+        "start_sec": 2.874666666666667,
+        "end_sec": 4.312,
+        "frame_start": 86,
+        "frame_end": 128,
+        "mapping_status": "mapped_to_video"
+      }
+    ],
+    "frame_content": "original_decoded_frames_without_overlay"
+  },
+  "15.png": {
+    "sample_id": "15",
+    "pred_class": 2,
+    "pred_regression": 0.9467169642448425,
+    "main_modality": "text",
+    "explanation_method": "counterfactual_occlusion",
+    "source_video": "D:\\MCMM\\23rd-MCMM\\E-q\\dataset\\attachment_4_explainability_videos_and_features\\attachment_4_explainability_videos_and_features\\aligned\\videos\\15.mp4",
+    "component_keyframes": [
+      "15_text_rank1.jpg",
+      "15_audio_rank1.jpg",
+      "15_vision_rank1.jpg"
+    ],
+    "evidence": [
+      {
+        "modality": "text",
+        "rank": 1,
+        "impact_score": 0.04834744334220886,
+        "start_index": 28,
+        "end_index": 34,
+        "start_sec": 4.1066666666666665,
+        "end_sec": 5.133333333333333,
+        "frame_start": 123,
+        "frame_end": 153,
+        "mapping_status": "mapped_to_video"
+      },
+      {
+        "modality": "audio",
+        "rank": 1,
+        "impact_score": 0.04168062284588814,
+        "start_index": 42,
+        "end_index": 48,
+        "start_sec": 6.16,
+        "end_sec": 7.1866666666666665,
+        "frame_start": 184,
+        "frame_end": 214,
+        "mapping_status": "mapped_to_video"
+      },
+      {
+        "modality": "vision",
+        "rank": 1,
+        "impact_score": 0.03805762901902199,
+        "start_index": 42,
+        "end_index": 48,
+        "start_sec": 6.16,
+        "end_sec": 7.1866666666666665,
+        "frame_start": 184,
+        "frame_end": 214,
+        "mapping_status": "mapped_to_video"
+      }
+    ],
+    "frame_content": "original_decoded_frames_without_overlay"
+  },
+  "16.png": {
+    "sample_id": "16",
+    "pred_class": 0,
+    "pred_regression": -2.6106021404266357,
+    "main_modality": "text",
+    "explanation_method": "counterfactual_occlusion",
+    "source_video": "D:\\MCMM\\23rd-MCMM\\E-q\\dataset\\attachment_4_explainability_videos_and_features\\attachment_4_explainability_videos_and_features\\aligned\\videos\\16.mp4",
+    "component_keyframes": [
+      "16_text_rank1.jpg",
+      "16_audio_rank1.jpg",
+      "16_vision_rank1.jpg"
+    ],
+    "evidence": [
+      {
+        "modality": "text",
+        "rank": 1,
+        "impact_score": 0.03623277693986893,
+        "start_index": 42,
+        "end_index": 48,
+        "start_sec": 2.6040000000000005,
+        "end_sec": 3.0380000000000003,
+        "frame_start": 78,
+        "frame_end": 90,
+        "mapping_status": "mapped_to_video"
+      },
+      {
+        "modality": "audio",
+        "rank": 1,
+        "impact_score": 0.014545312151312828,
+        "start_index": 0,
+        "end_index": 6,
+        "start_sec": 0.0,
+        "end_sec": 0.434,
+        "frame_start": 0,
+        "frame_end": 12,
+        "mapping_status": "mapped_to_video"
+      },
+      {
+        "modality": "vision",
+        "rank": 1,
+        "impact_score": 0.03076872043311596,
+        "start_index": 0,
+        "end_index": 6,
+        "start_sec": 0.0,
+        "end_sec": 0.434,
+        "frame_start": 0,
+        "frame_end": 12,
+        "mapping_status": "mapped_to_video"
+      }
+    ],
+    "frame_content": "original_decoded_frames_without_overlay"
+  },
+  "17.png": {
+    "sample_id": "17",
+    "pred_class": 2,
+    "pred_regression": 1.075547456741333,
+    "main_modality": "text",
+    "explanation_method": "counterfactual_occlusion",
+    "source_video": "D:\\MCMM\\23rd-MCMM\\E-q\\dataset\\attachment_4_explainability_videos_and_features\\attachment_4_explainability_videos_and_features\\aligned\\videos\\17.mp4",
+    "component_keyframes": [
+      "17_text_rank1.jpg",
+      "17_audio_rank1.jpg",
+      "17_vision_rank1.jpg"
+    ],
+    "evidence": [
+      {
+        "modality": "text",
+        "rank": 1,
+        "impact_score": 0.042718857526779175,
+        "start_index": 14,
+        "end_index": 20,
+        "start_sec": 2.6973333333333334,
+        "end_sec": 4.045999999999999,
+        "frame_start": 80,
+        "frame_end": 120,
+        "mapping_status": "mapped_to_video"
+      },
+      {
+        "modality": "audio",
+        "rank": 1,
+        "impact_score": 0.04635441675782204,
+        "start_index": 42,
+        "end_index": 48,
+        "start_sec": 8.091999999999999,
+        "end_sec": 9.440666666666665,
+        "frame_start": 242,
+        "frame_end": 282,
+        "mapping_status": "mapped_to_video"
+      },
+      {
+        "modality": "vision",
+        "rank": 1,
+        "impact_score": 0.023672398179769516,
+        "start_index": 7,
+        "end_index": 13,
+        "start_sec": 1.3486666666666667,
+        "end_sec": 2.6973333333333334,
+        "frame_start": 40,
+        "frame_end": 79,
+        "mapping_status": "mapped_to_video"
+      }
+    ],
+    "frame_content": "original_decoded_frames_without_overlay"
+  },
+  "18.png": {
+    "sample_id": "18",
+    "pred_class": 2,
+    "pred_regression": -1.0973143577575684,
+    "main_modality": "vision",
+    "explanation_method": "counterfactual_occlusion",
+    "source_video": "D:\\MCMM\\23rd-MCMM\\E-q\\dataset\\attachment_4_explainability_videos_and_features\\attachment_4_explainability_videos_and_features\\aligned\\videos\\18.mp4",
+    "component_keyframes": [
+      "18_text_rank1.jpg",
+      "18_audio_rank1.jpg",
+      "18_vision_rank1.jpg"
+    ],
+    "evidence": [
+      {
+        "modality": "text",
+        "rank": 1,
+        "impact_score": 0.17369526624679565,
+        "start_index": 35,
+        "end_index": 41,
+        "start_sec": 13.09,
+        "end_sec": 15.708,
+        "frame_start": 392,
+        "frame_end": 470,
+        "mapping_status": "mapped_to_video"
+      },
+      {
+        "modality": "audio",
+        "rank": 1,
+        "impact_score": 0.09342260658740997,
+        "start_index": 42,
+        "end_index": 48,
+        "start_sec": 15.708,
+        "end_sec": 18.326,
+        "frame_start": 471,
+        "frame_end": 548,
+        "mapping_status": "mapped_to_video"
+      },
+      {
+        "modality": "vision",
+        "rank": 1,
+        "impact_score": 0.06546708196401596,
+        "start_index": 7,
+        "end_index": 13,
+        "start_sec": 2.6180000000000003,
+        "end_sec": 5.236000000000001,
+        "frame_start": 78,
+        "frame_end": 156,
+        "mapping_status": "mapped_to_video"
+      }
+    ],
+    "frame_content": "original_decoded_frames_without_overlay"
+  },
+  "19.png": {
+    "sample_id": "19",
+    "pred_class": 2,
+    "pred_regression": 0.46112045645713806,
+    "main_modality": "text",
+    "explanation_method": "counterfactual_occlusion",
+    "source_video": "D:\\MCMM\\23rd-MCMM\\E-q\\dataset\\attachment_4_explainability_videos_and_features\\attachment_4_explainability_videos_and_features\\aligned\\videos\\19.mp4",
+    "component_keyframes": [
+      "19_text_rank1.jpg",
+      "19_audio_rank1.jpg",
+      "19_vision_rank1.jpg"
+    ],
+    "evidence": [
+      {
+        "modality": "text",
+        "rank": 1,
+        "impact_score": 0.1645233929157257,
+        "start_index": 42,
+        "end_index": 48,
+        "start_sec": 11.452,
+        "end_sec": 13.360666666666667,
+        "frame_start": 343,
+        "frame_end": 399,
+        "mapping_status": "mapped_to_video"
+      },
+      {
+        "modality": "audio",
+        "rank": 1,
+        "impact_score": 0.03695188835263252,
+        "start_index": 7,
+        "end_index": 13,
+        "start_sec": 1.9086666666666667,
+        "end_sec": 3.8173333333333335,
+        "frame_start": 57,
+        "frame_end": 113,
+        "mapping_status": "mapped_to_video"
+      },
+      {
+        "modality": "vision",
+        "rank": 1,
+        "impact_score": 0.0589853897690773,
+        "start_index": 42,
+        "end_index": 48,
+        "start_sec": 11.452,
+        "end_sec": 13.360666666666667,
+        "frame_start": 343,
+        "frame_end": 399,
+        "mapping_status": "mapped_to_video"
+      }
+    ],
+    "frame_content": "original_decoded_frames_without_overlay"
+  },
+  "20.png": {
+    "sample_id": "20",
+    "pred_class": 2,
+    "pred_regression": 0.8716873526573181,
+    "main_modality": "text",
+    "explanation_method": "counterfactual_occlusion",
+    "source_video": "D:\\MCMM\\23rd-MCMM\\E-q\\dataset\\attachment_4_explainability_videos_and_features\\attachment_4_explainability_videos_and_features\\aligned\\videos\\20.mp4",
+    "component_keyframes": [
+      "20_text_rank1.jpg",
+      "20_audio_rank1.jpg",
+      "20_vision_rank1.jpg"
+    ],
+    "evidence": [
+      {
+        "modality": "text",
+        "rank": 1,
+        "impact_score": 0.11420644819736481,
+        "start_index": 42,
+        "end_index": 48,
+        "start_sec": 9.128,
+        "end_sec": 10.649333333333335,
+        "frame_start": 273,
+        "frame_end": 318,
+        "mapping_status": "mapped_to_video"
+      },
+      {
+        "modality": "audio",
+        "rank": 1,
+        "impact_score": 0.03466763347387314,
+        "start_index": 35,
+        "end_index": 41,
+        "start_sec": 7.606666666666667,
+        "end_sec": 9.128,
+        "frame_start": 228,
+        "frame_end": 272,
+        "mapping_status": "mapped_to_video"
+      },
+      {
+        "modality": "vision",
+        "rank": 1,
+        "impact_score": 0.054375745356082916,
+        "start_index": 28,
+        "end_index": 34,
+        "start_sec": 6.085333333333333,
+        "end_sec": 7.606666666666667,
+        "frame_start": 182,
+        "frame_end": 227,
+        "mapping_status": "mapped_to_video"
+      }
+    ],
+    "frame_content": "original_decoded_frames_without_overlay"
+  }
+}

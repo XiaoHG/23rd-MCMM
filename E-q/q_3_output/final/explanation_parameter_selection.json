@@ -1,0 +1,75 @@
+{
+  "candidates": [
+    {
+      "baseline": "zero_invalid",
+      "window": 3,
+      "stride": 3,
+      "sample_count": 728,
+      "mean_top_impact": 0.03351671428243961,
+      "mean_low_impact": 0.0008291984319925887,
+      "top_minus_low": 0.03268751585044702,
+      "top_to_low_ratio": 40.42061946728233
+    },
+    {
+      "baseline": "zero_invalid",
+      "window": 5,
+      "stride": 5,
+      "sample_count": 728,
+      "mean_top_impact": 0.04550983574908336,
+      "mean_low_impact": 0.001926564177835474,
+      "top_minus_low": 0.04358327157124789,
+      "top_to_low_ratio": 23.622278599726897
+    },
+    {
+      "baseline": "zero_invalid",
+      "window": 7,
+      "stride": 7,
+      "sample_count": 728,
+      "mean_top_impact": 0.053828579226219614,
+      "mean_low_impact": 0.0015897532708373419,
+      "top_minus_low": 0.05223882595538227,
+      "top_to_low_ratio": 33.85970654293258
+    },
+    {
+      "baseline": "train_mean",
+      "window": 3,
+      "stride": 3,
+      "sample_count": 728,
+      "mean_top_impact": 0.041177467353498705,
+      "mean_low_impact": 0.001758599774998585,
+      "top_minus_low": 0.03941886757850012,
+      "top_to_low_ratio": 23.41491676440811
+    },
+    {
+      "baseline": "train_mean",
+      "window": 5,
+      "stride": 5,
+      "sample_count": 728,
+      "mean_top_impact": 0.05938663380988106,
+      "mean_low_impact": 0.004516831604146503,
+      "top_minus_low": 0.05486980220573455,
+      "top_to_low_ratio": 13.147852081836183
+    },
+    {
+      "baseline": "train_mean",
+      "window": 7,
+      "stride": 7,
+      "sample_count": 728,
+      "mean_top_impact": 0.07485291513958911,
+      "mean_low_impact": 0.0032877145976848354,
+      "top_minus_low": 0.07156520054190428,
+      "top_to_low_ratio": 22.76746138253592
+    }
+  ],
+  "selected": {
+    "baseline": "train_mean",
+    "window": 7,
+    "stride": 7,
+    "sample_count": 728,
+    "mean_top_impact": 0.07485291513958911,
+    "mean_low_impact": 0.0032877145976848354,
+    "top_minus_low": 0.07156520054190428,
+    "top_to_low_ratio": 22.76746138253592
+  },
+  "selection_rule": "maximize corrected valid top-minus-low impact; ties prefer smaller window then zero_invalid"
+}

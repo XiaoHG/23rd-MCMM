@@ -1,0 +1,21 @@
+{
+  "mode": "v7_unified_explanation_finalize",
+  "source_run_dir": "D:\\MCMM\\23rd-MCMM\\E-q\\q_3_output\\20260925_100021_726334600",
+  "checkpoint_sha256": "490cb5412078200eeb49978bedfbe61aea8cdcdee98d7ba1bc0f608b0eeca652",
+  "standardizer_sha256": "a50d8f9d020c341a0e3f4956d0a9b7b6dacddb3d74f506ca4da81b62b25f6e8d",
+  "feature_path": "D:\\MCMM\\23rd-MCMM\\E-q\\dataset\\attachment_2_feature_files\\aligned_50.pkl",
+  "feature_sha256": "66e867aa74bc70a844e806e5571e371c9abb4a35f9e2887ce9b4d97ff2cb8fcd",
+  "feature_version": "aligned",
+  "seed": 20260924,
+  "device": "cuda",
+  "baseline": "train_mean",
+  "baseline_space": "standardized_train_features_once",
+  "window": 7,
+  "stride": 7,
+  "top_k": 3,
+  "train_count": 3395,
+  "valid_count": 728,
+  "test_count": 727,
+  "attachment4_count": 20,
+  "attachment4_used_for": "inference_only"
+}

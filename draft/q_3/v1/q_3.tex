@@ -1,0 +1,625 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\PassOptionsToPackage{dvipsnames,svgnames*,x11names*}{xcolor}
+%
+\documentclass[
+  12pt,
+  a4paper,
+]{ctexart}
+\usepackage{amsmath,amssymb}
+\usepackage{lmodern}
+\usepackage{setspace}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\hypersetup{
+  colorlinks=true,
+  linkcolor={blue},
+  filecolor={Maroon},
+  citecolor={Blue},
+  urlcolor={blue},
+  pdfcreator={LaTeX via pandoc}}
+\urlstyle{same} % disable monospaced font for URLs
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{longtable,booktabs,array}
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+
+\author{}
+\date{}
+
+\begin{document}
+
+\setstretch{1.5}
+\hypertarget{ux7b2cux516bux7ae0-ux95eeux9898ux4e09ux5efaux6a21ux8fc7ux7a0bux4e0eux5b9eux65bdux6280ux672fux8defux7ebf}{%
+\section{第八章
+问题三建模过程与实施技术路线}\label{ux7b2cux516bux7ae0-ux95eeux9898ux4e09ux5efaux6a21ux8fc7ux7a0bux4e0eux5b9eux65bdux6280ux672fux8defux7ebf}}
+
+\hypertarget{ux5efaux6a21ux76eeux6807ux4e0eux603bux4f53ux6846ux67b6}{%
+\subsection{8.1
+建模目标与总体框架}\label{ux5efaux6a21ux76eeux6807ux4e0eux603bux4f53ux6846ux67b6}}
+
+问题三要求在完成多模态情感预测的同时，给出能够复核的解释证据。与仅追求分类准确率或回归误差的常规情感分析不同，本问题的输出需要回答三个层次的问题：其一，样本的情感极性和连续情感强度分别为何；其二，文本、音频与视觉三种模态对本次预测的作用程度如何；其三，模型作出判断时主要依赖哪些文本片段、音频时间段和视觉帧区间。因而，本问题不能将注意力权重或门控系数直接等同于解释结论，而应在预测模型固定后，通过可控遮挡检验输入变化是否真正改变预测结果。
+
+考虑到三模态特征存在维度异构、有效长度不同、局部位置可能无效以及情感线索跨模态互补等特点，本文严格采用``掩码感知三模态时序编码器--样本级动态融合--分类回归双任务预测--反事实模态与时间窗口解释''的统一框架。其处理流程如图示逻辑所示：首先将三模态特征投影到统一隐空间，并在有效位置掩码约束下进行模态内时序编码；其次，使用文本查询音频和视觉信息构造轻量跨模态交互，再以样本级动态门控完成融合；最后，通过分类头和回归头分别输出情感极性与情感强度。模型训练完成后，不把内部注意力或门控权重作为归因，而是遮挡完整模态及局部时间窗，比较干预前后预测差异，形成模态级贡献和局部证据定位结果。
+
+设第 (i) 条样本的文本、音频、视觉序列分别为
+
+\[
+X_i^{(m)}=(x_{i,1}^{(m)},\ldots,x_{i,L_m}^{(m)}),
+\qquad m\in\{T,A,V\},
+\]
+
+其中，(T)、(A)、(V) 分别表示文本、音频和视觉，(L\_m) 表示模态 (m)
+的序列长度。对应的有效位置掩码定义为
+
+\[
+M_i^{(m)}=(m_{i,1}^{(m)},\ldots,m_{i,L_m}^{(m)}),
+\qquad m_{i,t}^{(m)}\in\{0,1\}.
+\]
+
+当 (m\_\{i,t\}\^{}\{(m)\}=1) 时，该位置为有效观测；当其等于 0
+时，该位置为
+padding、缺失或其他无效位置。掩码不以特征值是否为零推断，而是作为网络注意力、池化和遮挡操作的显式输入，从机制上避免零填充被误解释为真实情感信号。
+
+该框架的设计同时吸收了 CMU-MOSEI
+可解释多模态研究中的两点启发：一是模态交互和样本级融合应随具体语境动态变化；二是内部权重本身不足以证明模型的决策依据，必须使用干预式检验评价解释忠实性。本文不引入外部情感数据参与训练，不将外部论文指标作为本项目结论，也不将模型敏感片段表述为人工标注意义上的真实情感原因。
+
+\hypertarget{ux6570ux636eux9002ux914dux4e0eux8f93ux5165ux89c4ux8303}{%
+\subsection{8.2
+数据适配与输入规范}\label{ux6570ux636eux9002ux914dux4e0eux8f93ux5165ux89c4ux8303}}
+
+\hypertarget{ux7279ux5f81ux7248ux672cux4e0eux6837ux672cux4e3bux952e}{%
+\subsubsection{8.2.1
+特征版本与样本主键}\label{ux7279ux5f81ux7248ux672cux4e0eux6837ux672cux4e3bux952e}}
+
+题目提供 \texttt{aligned\_50.pkl} 和 \texttt{unaligned\_50.pkl}
+两个特征版本。为保证训练、验证、测试及无标签专项推理的数据语义一致，任一次实验只能固定其中一个版本，不能在不同划分中混用。本文当前实现选择
+\texttt{aligned\_50.pkl} 作为主路线：每个样本的文本、音频和视觉均组织为
+50
+个对齐时间位置，从而便于以统一窗口索引导出局部解释，并映射至附件四视频的时间区间和帧区间。非对齐版本可作为独立对照，但须保留各模态独立长度与掩码，不能将不同模态数组下标直接解释为同步时刻。
+
+所有跨文件关联均使用数据提供的稳定 \texttt{sample\_id}，不使用
+DataLoader
+顺序、文件遍历顺序或数组行号替代样本主键。附件二的主键通常采用
+\texttt{video\_id\$\_\$clip\_id} 形式；若 CSV 中主键以
+\texttt{-}、\texttt{=}、\texttt{+} 或 \texttt{@}
+开头，写出时附加单引号作为 Excel
+安全前缀，机器读取时再仅对文本主键去除这一前缀。该处理避免 Excel
+将主键误识别为公式，同时不影响数值型标签、贡献分数和时间索引。
+
+\hypertarget{ux6570ux636eux5212ux5206ux4e0eux7edfux8ba1ux8fb9ux754c}{%
+\subsubsection{8.2.2
+数据划分与统计边界}\label{ux6570ux636eux5212ux5206ux4e0eux7edfux8ba1ux8fb9ux754c}}
+
+附件二的 \texttt{train}、\texttt{valid}、\texttt{test}
+划分保持原样：训练集仅用于优化模型参数和拟合预处理统计量；验证集用于选择网络结构、损失权重、解释窗口长度、主导模态并列规则及其他超参数；测试集仅在模型和规则固定后进行一次性评估。附件四为无标签可解释性专项样本，只能由固定模型输出预测与解释，绝不参与训练、早停、阈值确定、参数选择或真实性能统计。
+
+对于每条样本，数据适配器输出如下对象：
+
+\begin{verbatim}
+sample_id
+text, audio, vision
+text_mask, audio_mask, vision_mask 或 modality_mask
+valid_lengths
+classification_labels, regression_labels（附件二）
+split
+\end{verbatim}
+
+当前 aligned 数据的实际输入维度为文本 768、音频 74、视觉
+35，三模态时间长度均为 50。分类标签为 (0,1,2)，回归标签范围为
+({[}-3,3{]})。分类标签语义、回归标签范围、输入维度和数据文件 SHA-256
+均写入
+\texttt{run\_config.json}，以保证后续复现时不会因字段版本变化产生隐性偏差。
+
+\hypertarget{ux8badux7ec3ux96c6ux72ecux4eabux6807ux51c6ux5316ux4e0eux7279ux5f81ux6295ux5f71}{%
+\subsubsection{8.2.3
+训练集独享标准化与特征投影}\label{ux8badux7ec3ux96c6ux72ecux4eabux6807ux51c6ux5316ux4e0eux7279ux5f81ux6295ux5f71}}
+
+不同模态的量纲和特征维度差异显著。为避免音频、视觉统计尺度主导梯度更新，先仅由训练集有效数据计算模态均值和标准差，并将
+\texttt{text\_mean/text\_std}、\texttt{audio\_mean/audio\_std}、\texttt{vision\_mean/vision\_std}
+保存至
+\texttt{train\_standardizer.npz}。验证集、测试集及附件四严格复用同一组统计量，禁止重新计算各自均值方差。
+
+标准化后的三种特征再通过模态专属线性层映射至共同的 (d) 维隐空间：
+
+\[
+e_{i,t}^{(m)}=\operatorname{LN}\left(W_m x_{i,t}^{(m)}+b_m\right),
+\qquad e_{i,t}^{(m)}\in\mathbb{R}^{d}.
+\]
+
+其中，(W\_m) 与 (b\_m)
+为训练集上学习得到的投影参数，(operatorname\{LN\}(\cdot))
+表示层归一化。统一隐空间一方面降低异构特征直接交互产生的尺度偏置，另一方面使后续注意力计算、样本级融合和双任务头能够共享相同的表示尺度。本文当前完整运行中设定
+(d=64)，该参数由验证集模型选择流程固定。
+
+\hypertarget{ux63a9ux7801ux611fux77e5ux4e09ux6a21ux6001ux65f6ux5e8fux7f16ux7801ux5668}{%
+\subsection{8.3
+掩码感知三模态时序编码器}\label{ux63a9ux7801ux611fux77e5ux4e09ux6a21ux6001ux65f6ux5e8fux7f16ux7801ux5668}}
+
+\hypertarget{ux4f4dux7f6eux8868ux793aux4e0eux65f6ux5e8fux8bedux4e49}{%
+\subsubsection{8.3.1
+位置表示与时序语义}\label{ux4f4dux7f6eux8868ux793aux4e0eux65f6ux5e8fux8bedux4e49}}
+
+情感表达具有时序性：文本中的否定、转折和程度词需要依赖上下文，音频中的语速、能量与语调变化具有连续性，视觉中的表情和动作亦需在相邻帧中理解。因此，投影特征不能仅做静态均值汇总。对第
+(t) 个时间位置加入位置编码 (p\_t)，得到
+
+\[
+\widetilde e_{i,t}^{(m)}=e_{i,t}^{(m)}+p_t.
+\]
+
+对于 aligned 输入，(t=0,\ldots,49)
+表示统一的相对时间窗口，因此可用于跨模态局部证据定位；对于 unaligned
+输入，(t)
+只表示各模态自身位置，不能直接与其他模态的同一下标等同。该区别在输出解释时必须保留，避免将数组对齐误读为真实逐词或逐帧同步。
+
+\hypertarget{ux6a21ux6001ux5185ux63a9ux7801ux7f16ux7801ux4e0eux6c47ux805a}{%
+\subsubsection{8.3.2
+模态内掩码编码与汇聚}\label{ux6a21ux6001ux5185ux63a9ux7801ux7f16ux7801ux4e0eux6c47ux805a}}
+
+每个模态通过独立的带掩码 Transformer 编码器获得上下文表征：
+
+\[
+H_i^{(m)}=\operatorname{Encoder}_m(\widetilde E_i^{(m)},M_i^{(m)}).
+\]
+
+在自注意力中，若键位置无效，则对其赋予负无穷掩码：
+
+\[
+S_{uv}^{(m)}=
+\begin{cases}
+q_u k_v^{\mathsf T}/\sqrt d,&m_{i,v}^{(m)}=1,\\
+-\infty,&m_{i,v}^{(m)}=0.
+\end{cases}
+\]
+
+该机制使无效位置在 softmax
+归一化前被排除，不会向有效位置传播虚假信息。对于某模态完全无效的极端样本，工程实现保留其
+\texttt{modality\_present=0} 状态，并以安全 padding
+规则避免``全为负无穷''导致数值溢出；该模态的汇聚表示置零，而非赋予任意伪特征。
+
+每个模态的全局摘要向量采用掩码平均池化：
+
+\[
+g_i^{(m)}=
+\frac{\sum_{t=1}^{L_m}m_{i,t}^{(m)}H_{i,t}^{(m)}}
+{\max(1,\sum_{t=1}^{L_m}m_{i,t}^{(m)})}.
+\]
+
+分母中的 (max(1,\cdot)) 保证全缺失模态不会发生除零；分子中的掩码则保证
+padding
+不参与表示聚合。与直接取序列末端状态相比，该汇聚方式对不同有效长度更加稳健，也为问题二、问题三中局部模态无效场景保留了明确的语义边界。
+
+\hypertarget{ux8de8ux6a21ux6001ux4ea4ux4e92}{%
+\subsubsection{8.3.3 跨模态交互}\label{ux8de8ux6a21ux6001ux4ea4ux4e92}}
+
+单模态编码虽然能提取各自的时间依赖，却无法充分表达``文字内容与语气相反''``面部表情强化或削弱文本极性''等跨模态互补关系。为在保持模型规模可控的同时刻画主要交互，本文以文本序列作为查询，分别从音频和视觉序列中提取相关上下文：
+
+\[
+R_i^{T\leftarrow A}=\operatorname{MHA}(H_i^{(T)},H_i^{(A)},H_i^{(A)};M_i^{(A)}),
+\]
+
+\[
+R_i^{T\leftarrow V}=\operatorname{MHA}(H_i^{(T)},H_i^{(V)},H_i^{(V)};M_i^{(V)}).
+\]
+
+其中，多头注意力的键和值均受音频或视觉掩码约束。随后，将单模态摘要和跨模态响应的池化摘要组合为
+
+\[
+u_i=[g_i^{(T)};g_i^{(A)};g_i^{(V)};
+\operatorname{Pool}(R_i^{T\leftarrow A});
+\operatorname{Pool}(R_i^{T\leftarrow V})].
+\]
+
+上述交互表示用于增强预测表示，而不直接导出为解释结论。CMU-MOSEI
+相关研究说明，跨模态注意力有助于处理异构和异步信息，但注意力较高不必然意味着对最终输出有实质影响。因此，本文只将其作为表征学习模块，最终解释仍由第
+8.5 节的反事实遮挡计算给出。
+
+\hypertarget{ux6837ux672cux7ea7ux52a8ux6001ux878dux5408ux4e0eux53ccux4efbux52a1ux9884ux6d4b}{%
+\subsection{8.4
+样本级动态融合与双任务预测}\label{ux6837ux672cux7ea7ux52a8ux6001ux878dux5408ux4e0eux53ccux4efbux52a1ux9884ux6d4b}}
+
+\hypertarget{ux6837ux672cux7ea7ux52a8ux6001ux6a21ux6001ux878dux5408}{%
+\subsubsection{8.4.1
+样本级动态模态融合}\label{ux6837ux672cux7ea7ux52a8ux6001ux6a21ux6001ux878dux5408}}
+
+三模态的可靠性和信息量随样本内容而变化。例如，文本可能表达明确情感，音频可能在讽刺表达中提供关键声学线索，视觉也可能因遮挡、光照或表情不明显而贡献有限。因此，采用固定融合权重容易掩盖样本差异。本文对每个样本、每个模态计算动态门控得分：
+
+\[
+a_i^{(m)}=w_m^{\mathsf T}g_i^{(m)}+b_m,
+\]
+
+\[
+\alpha_i^{(m)}=
+\frac{m_i^{(m)}\exp(a_i^{(m)})}
+{\sum_{r\in\{T,A,V\}}m_i^{(r)}\exp(a_i^{(r)})+\varepsilon},
+\]
+
+其中，\(m_i^{(m)}=\mathbf{1}(\sum_t m_{i,t}^{(m)}>0)\)
+用于表征模态是否存在有效观测；\(\varepsilon\)
+用于保持分母数值稳定。最终融合表示为
+
+\[
+z_i=\operatorname{MLP}\left(\sum_{m\in\{T,A,V\}}\alpha_i^{(m)}g_i^{(m)}\right).
+\]
+
+该机制在模态完整时允许网络自主学习不同样本的融合比例，在模态局部或整体无效时又能通过
+(m\_i\^{}\{(m)\})
+避免无效模态参与归一化。需要强调的是，(alpha\_i\^{}\{(m)\})
+是网络的内部融合参数，只用于诊断模型如何组合表示，不能直接作为``该模态真实贡献''的结论。为保证解释忠实性，实际贡献由反事实干预后的预测差异重新定义。
+
+\hypertarget{ux6781ux6027ux5206ux7c7bux5934ux4e0eux5f3aux5ea6ux56deux5f52ux5934}{%
+\subsubsection{8.4.2
+极性分类头与强度回归头}\label{ux6781ux6027ux5206ux7c7bux5934ux4e0eux5f3aux5ea6ux56deux5f52ux5934}}
+
+情感极性与情感强度相关但不完全等价：分类任务需要识别正向、中性和负向类别，回归任务则要刻画强弱程度。若分别训练两个互不通信的模型，可能导致两种输出在边界样本上不一致。为此，本文以共享融合表示
+(z\_i) 为基础设置双任务头。
+
+分类头输出三类 logits：
+
+\[
+o_i^{cls}=W_{cls}z_i+b_{cls},
+\qquad
+p_i=\operatorname{softmax}(o_i^{cls}).
+\]
+
+分类损失采用带类别权重的交叉熵：
+
+\[
+\mathcal L_{cls}=-\frac1B\sum_{i=1}^{B}
+\sum_{c=1}^{C}w_c y_{i,c}\log p_{i,c}.
+\]
+
+其中，类别权重 (w\_c)
+只依据训练集类别频数计算，用于缓解类别分布不均衡造成的主类偏向。回归头输出连续强度：
+
+\[
+\widehat y_i^{reg}=s_{max}\tanh(w_{reg}^{\mathsf T}z_i+b_{reg}),
+\]
+
+其中，(s\_\{max\}=3)，使预测自然受限于题给 ({[}-3,3{]})
+范围。回归损失定义为
+
+\[
+\mathcal L_{reg}=\frac1B\sum_{i=1}^{B}
+\operatorname{SmoothL1}(\widehat y_i^{reg}-y_i^{reg}).
+\]
+
+最终预测目标为
+
+\[
+\mathcal L_{pred}=\lambda_{cls}\mathcal L_{cls}
+ +\lambda_{reg}\mathcal L_{reg}.
+\]
+
+权重 (lambda\_\{cls\}) 与 (lambda\_\{reg\})
+由训练集优化、验证集选择并写入运行配置，禁止根据测试集或附件四结果回调。共享编码器通过双任务梯度同时学习类别边界与强度连续性，分类头与回归头则保留各自的任务适配能力。
+
+\hypertarget{ux53cdux4e8bux5b9eux6a21ux6001ux8d21ux732eux4e0eux5c40ux90e8ux65f6ux95f4ux8bc1ux636e}{%
+\subsection{8.5
+反事实模态贡献与局部时间证据}\label{ux53cdux4e8bux5b9eux6a21ux6001ux8d21ux732eux4e0eux5c40ux90e8ux65f6ux95f4ux8bc1ux636e}}
+
+\hypertarget{ux6a21ux6001ux7ea7ux53cdux4e8bux5b9eux906eux6321}{%
+\subsubsection{8.5.1
+模态级反事实遮挡}\label{ux6a21ux6001ux7ea7ux53cdux4e8bux5b9eux906eux6321}}
+
+为避免``权重高即贡献大''的解释误区，本文将模态贡献定义为反事实干预后预测的实际变化。对模态
+(m) 构造输入 (X\_i\^{}\{-m\})：保持其余两模态不变，将模态 (m)
+的有效特征置零，并将其对应 mask 置为
+0。该操作表示``若该模态在本次预测中不可用，模型输出将如何变化''。为检验遮挡基线敏感性，实施方案同时保留两种可选基线：其一为零/无效基线，即特征置零且
+mask 置 0；其二为训练集均值基线，即以训练集有效位置均值替换特征且保持
+mask 为
+1。主实验必须在运行前固定一种基线，另一种只能用于敏感性分析，不能根据附件四结果事后选择。
+
+设完整输入的分类概率与回归输出分别为 (p\_i)、(widehat
+y\_i)，遮挡模态后的输出为 (p\_i\^{}\{-m\})、(widehat
+y\_i\^{}\{-m\})。分类变化以 KL 散度度量：
+
+\[
+\Delta_{i,m}^{cls}=D_{KL}(p_i\Vert p_i^{-m}),
+\]
+
+回归变化定义为
+
+\[
+\Delta_{i,m}^{reg}=|\widehat y_i-\widehat y_i^{-m}|.
+\]
+
+在验证集上按预先确定的尺度对二者标准化后，得到综合影响：
+
+\[
+r_{i,m}=\rho_{cls}\widetilde\Delta_{i,m}^{cls}
+ +(1-\rho_{cls})\widetilde\Delta_{i,m}^{reg}.
+\]
+
+最终模态贡献为
+
+\[
+c_{i,m}=\frac{\max(r_{i,m},0)}
+{\sum_{r\in\{T,A,V\}}\max(r_{i,r},0)+\varepsilon}.
+\]
+
+其中，(c\_\{i,m\}) 对应输出表中的
+\texttt{modality\_contrib\_text}、\texttt{modality\_contrib\_audio}、\texttt{modality\_contrib\_vision}，同一条样本三个值之和约为
+1。贡献最大者输出为
+\texttt{main\_modality}；如未来采用并列规则，其阈值必须在验证集预先确定。该定义将``模型确实会因移除该模态而改变预测''的事实显式纳入解释，优于只读取内部注意力或门控系数。
+
+\hypertarget{ux5c40ux90e8ux65f6ux95f4ux7a97ux906eux6321ux4e0eux8bc1ux636eux56deux6eaf}{%
+\subsubsection{8.5.2
+局部时间窗遮挡与证据回溯}\label{ux5c40ux90e8ux65f6ux95f4ux7a97ux906eux6321ux4e0eux8bc1ux636eux56deux6eaf}}
+
+模态级贡献只能说明模型总体依赖何种信息，不能定位决定性片段。为此，对每个模态有效序列采用长度为
+(w) 的滑动窗口，窗口 (J\_\{i,m,k\})
+中的特征与掩码被同步遮挡，得到局部干预输出 (p\_i\^{}\{-m,k\})、(widehat
+y\_i\^{}\{-m,k\})。局部影响定义为
+
+\[
+r_{i,m,k}^{local}=
+\rho_{cls}D_{KL}(p_i\Vert p_i^{-m,k})
+ +(1-\rho_{cls})
+ |\widehat y_i-\widehat y_i^{-m,k}|.
+\]
+
+仅当窗口内存在有效位置时才计算该分数，避免将纯 padding
+窗口列为证据。之后按 (r\_\{i,m,k\}\^{}\{local\}) 降序选取前 (K)
+个非重叠窗口，并合并相邻区间。当前完整运行固定窗口长度为 5、步长为
+5、每模态保留至多 3 段证据，相关参数均记录在 \texttt{run\_config.json}
+中。
+
+对 aligned 数据，\texttt{start\_index}、\texttt{end\_index} 取值范围为
+0--49。附件四视频存在时，系统按视频实际时长将窗口换算为
+\texttt{start\_sec}、\texttt{end\_sec}，并结合帧率生成
+\texttt{frame\_start}、\texttt{frame\_end}；由此形成
+\texttt{evidence\_mapping\_attachment4.csv}，支持回看原始视频。文本证据保留
+\texttt{raw\_text} 和
+\texttt{text\_time\_source=raw\_text;\ aligned\ relative\ window}。由于文本不存在观测得到的逐词时间戳，文本窗口只能理解为基于
+aligned 相对位置的时间代理，不能写成真实逐词对齐。
+
+对于附件二中无法在附件一原始视频库中找到源视频的样本，输出
+\texttt{mapping\_status=relative\_window\_only\_source\_video\_missing}，只保留相对窗口和文本，不伪造秒数、帧数或视频证据。局部遮挡结果应称为``模型预测敏感片段''或``模型证据''，而不是人类真实情感诱因。
+
+\hypertarget{ux5f31ux76d1ux7763ux8054ux5408ux5b9aux4f4dux589eux5f3aux65b9ux6848}{%
+\subsection{8.6
+弱监督联合定位增强方案}\label{ux5f31ux76d1ux7763ux8054ux5408ux5b9aux4f4dux589eux5f3aux65b9ux6848}}
+
+为检验解释是否必须在训练阶段显式优化，本文保留弱监督联合证据定位作为消融对照
+B5，而不替代主方案。令模型额外输出每一模态、每一时间位置的定位概率
+(q\_\{i,t\}\^{}\{(m)\})。由于赛题并未提供逐词、逐帧的情感原因真值，不能构造常规监督定位标签；因此仅使用稀疏约束和反事实遮挡排序构造弱监督目标。
+
+稀疏约束为
+
+\[
+\mathcal L_{sparse}=\sum_{m,t}q_{i,t}^{(m)},
+\]
+
+其作用是避免定位分支将全部时间位置都赋予高重要性。再根据局部遮挡影响构造排序约束：
+
+\[
+\mathcal L_{rank}=\sum_{(u,v):r_u>r_v}
+\max(0,\delta-q_u+q_v).
+\]
+
+联合训练目标写为
+
+\[
+\mathcal L=\mathcal L_{pred}
+ +\lambda_s\mathcal L_{sparse}
+ +\lambda_r\mathcal L_{rank}.
+\]
+
+该方案严格保持在既定技术路线内，但其定位排序依赖模型自身产生的反事实信号，可能引入伪标签偏差、额外超参数和训练不稳定性。因此，只有当
+B5
+在相同划分下同时改善预测性能或解释忠实性时，才可作为增强结论；若无稳定证据，应保留第
+8.5 节的后验反事实解释作为主方案。
+
+\hypertarget{ux8badux7ec3ux9a8cux8bc1ux6d4bux8bd5ux4e0eux4e13ux9879ux63a8ux7406ux6d41ux7a0b}{%
+\subsection{8.7
+训练、验证、测试与专项推理流程}\label{ux8badux7ec3ux9a8cux8bc1ux6d4bux8bd5ux4e0eux4e13ux9879ux63a8ux7406ux6d41ux7a0b}}
+
+为确保结果可复现并避免数据泄漏，完整实施流程按如下顺序执行：
+
+\begin{verbatim}
+读取固定配置、特征版本和随机种子
+        |
+读取附件二 train/valid/test，检查 sample_id、字段、维度和标签范围
+        |
+仅用 train 拟合标准化参数、类别权重及遮挡基线统计量
+        |
+训练 B0--B3 主干模型，记录每轮 train/valid loss
+        |
+在 valid 上选择模型、损失权重、解释窗口和并列规则
+        |
+冻结最终模型，在 test 上执行一次性 Accuracy/F1/MAE/Pearson 评估
+        |
+在有标签划分执行模态遮挡和局部窗口遮挡，完成忠实性诊断
+        |
+固定模型对附件四生成预测、模态贡献和可回溯证据，不训练、不调参
+\end{verbatim}
+
+当前实现固定随机种子为 20260924，使用 CUDA 完成两轮训练，采用
+\texttt{aligned\_50.pkl}。训练过程由 \texttt{training\_log.csv}
+记录；验证损失最低的模型权重保存为
+\texttt{best\_model.pt}；训练集统计量保存为
+\texttt{train\_standardizer.npz}；输入文件哈希、维度、超参数、设备、数据边界与解释参数全部写入
+\texttt{run\_config.json}。每一次运行均在
+\texttt{E-q/q\_3\_output/\textless{}YYYYMMDD\_HHMMSS\_microseconds\textgreater{}/}
+创建独立目录，禁止覆盖历史结果。
+
+完整运行目录至少包含
+\texttt{model\_metrics.csv}、\texttt{predictions\_valid.csv}、\texttt{predictions\_test.csv}、\texttt{explanations\_valid.csv}、\texttt{evidence\_mapping\_valid.csv}、\texttt{predictions\_attachment4.csv}、\texttt{evidence\_mapping\_attachment4.csv}、\texttt{fidelity\_metrics.csv}、\texttt{anomalies.csv}、\texttt{validation\_audit.json}
+和 \texttt{output\_checksums.json}。CSV 采用 UTF-8 BOM
+编码；输出审计记录训练/验证/测试主键无交集、三划分标签存在、数值可用以及附件四只用于推理等检查项。
+
+\hypertarget{ux8bc4ux4ef7ux4f53ux7cfbux4e0eux5f53ux524dux8fd0ux884cux7ed3ux679c}{%
+\subsection{8.8
+评价体系与当前运行结果}\label{ux8bc4ux4ef7ux4f53ux7cfbux4e0eux5f53ux524dux8fd0ux884cux7ed3ux679c}}
+
+分类任务使用 Accuracy 和宏平均 F1 评价。Accuracy 定义为
+
+\[
+\operatorname{Accuracy}=\frac{\#\{\widehat c_i=c_i\}}{N}.
+\]
+
+其中，(widehat c\_i) 与 (c\_i) 分别为预测类别和真实类别。宏平均 F1
+对各类别 F1
+等权平均，可避免样本较多的类别掩盖少数类别的错误。回归任务采用 MAE 与
+Pearson 相关系数，MAE 为
+
+\[
+\operatorname{MAE}=\frac1N\sum_i|\widehat y_i-y_i|.
+\]
+
+Pearson
+系数反映预测强度与真实强度的线性一致性。分类和回归指标必须同时报告数据划分、标签映射、随机种子与特征版本，不能在无标签附件四上计算。
+
+解释性评价采用局部窗口删除忠实性检验。具体而言，对每个已解释样本比较高重要性窗口与低重要性窗口被遮挡后的平均预测变化；若高重要性窗口产生的影响更大，则说明当前排序与模型决策敏感性具有一致性。该检验以
+\texttt{fidelity\_metrics.csv} 保存，核心字段包括
+\texttt{mean\_top\_evidence\_impact}、\texttt{mean\_low\_evidence\_impact}
+和参与样本数。
+
+在当前完整运行 \texttt{20260924\_122451\_914931800} 中，自动审计
+\texttt{passed=true}，确认训练、验证、测试主键互不重叠，且附件四只用于推理。使用附件二完整划分训练后，验证集
+Accuracy 为 0.5975、Macro-F1 为 0.5016、MAE 为 0.6533、Pearson 为
+0.5772；固定模型后一次性测试，测试集 Accuracy 为 0.6630、Macro-F1 为
+0.5367、MAE 为 0.6764、Pearson 为
+0.6352。该组数值仅代表当前固定配置、随机种子和两轮训练下的单次运行结果，不应直接视为多随机种子平均性能或最终最优结论。
+
+同一运行中，32 条验证样本的高重要性窗口平均遮挡影响为
+0.047125，低重要性窗口为
+0.002478。该结果表明，按照当前反事实排序选出的高重要性窗口在本模型中平均引起更大的预测变化，提供了局部解释忠实性的初步证据；但其不等价于真实因果关系，也不能替代人工情感原因标注。
+
+\hypertarget{ux57faux7ebfux6d88ux878dux4e0eux5bf9ux7167ux5b9eux9a8cux8bbeux8ba1}{%
+\subsection{8.9
+基线、消融与对照实验设计}\label{ux57faux7ebfux6d88ux878dux4e0eux5bf9ux7167ux5b9eux9a8cux8bbeux8ba1}}
+
+为判断各模块的必要性，所有模型必须在相同数据划分、标签规则、训练轮数策略、特征版本和评价指标下进行以下对照，且
+B0--B5、A1--A2 均不得省略或额外替换：
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule
+编号 & 输入或模型变化 & 验证目的 \\
+\midrule
+\endhead
+B0 & 文本单模态加双任务头 & 建立文本语义基线，评估非文本模态增益 \\
+B1 & 三模态 masked late fusion & 验证三模态互补性与显式 mask
+的基础作用 \\
+B2 & 三模态跨模态注意力 & 检验时序交互是否优于静态后融合 \\
+B3 & B2 加样本级动态门控 & 检验动态模态选择对预测的作用 \\
+B4 & B3 加反事实解释 & 在不改变预测主干的前提下检验解释忠实性 \\
+B5 & B3 加弱监督联合定位 & 比较联合定位是否优于后验反事实解释 \\
+A1 & 完整输入与单模态遮挡 &
+比较不同模态被移除后的预测变化，验证模态贡献 \\
+A2 & 连续局部窗口缺失 & 检验局部证据定位与缺失情境下的稳定性 \\
+\bottomrule
+\end{longtable}
+
+B0--B3 的重点是预测性能，B4--B5
+的重点是解释机制是否带来可验证的忠实性增益，A1--A2
+则直接检验干预规则。对照结果除 Accuracy、F1、MAE、Pearson 外，还应报告
+KL
+散度变化、回归输出变化、模态贡献分布、高低重要性窗口删除差异和必要的失败案例。当前已完成的是
+B3 主路线的一次完整运行及其反事实解释输出；其余
+B0、B1、B2、B4、B5、A1、A2
+的全量对照结果仍需按该表重跑后才能形成实验比较结论，不能虚构性能排序。
+
+\hypertarget{ux9002ux7528ux8fb9ux754cux4e0eux98ceux9669ux63a7ux5236}{%
+\subsection{8.10
+适用边界与风险控制}\label{ux9002ux7528ux8fb9ux754cux4e0eux98ceux9669ux63a7ux5236}}
+
+本文模型的适用边界如下。
+
+第一，\texttt{aligned\_50.pkl} 的 50
+个时间位置是标准化特征组织，不是附件四文本的真实逐词时间戳。文本证据只能定位至
+aligned 相对窗口，并应保留 \texttt{text\_time\_source}
+说明。第二，附件二中并非所有 \texttt{sample\_id} 均能与附件一的 100
+条原始视频一一对应；当 \texttt{source\_exists=false}
+时，局部解释只能回溯至特征窗口与原始文本，不能生成虚假的视频帧范围。第三，反事实遮挡测量的是模型决策对输入变化的依赖程度，不能推断人类心理机制或真实情感原因。
+
+第四，内部动态门控 (alpha\_i\^{}\{(m)\})
+和跨模态注意力仅服务于表征学习与模型诊断，不能直接被视为最终解释。第五，附件四无真实标签，故其输出只能作为预测和证据文件，不能据此调整参数、挑选遮挡基线、选择窗口长度，也不能报告真实性能。第六，当前完整结果只使用单一随机种子和两轮训练，虽然已完成数据边界和输出审计，但模型稳定性、不同窗口长度敏感性、不同随机种子离散度仍需通过后续消融补充。
+
+此外，当前版本使用题给预计算特征，不将 CMU-MOSEI
+外部论文结果、外部预训练权重或公开工程输出混入本项目结论。任何后续替换特征、增加训练轮数或调整损失权重的操作，都必须重新创建时间戳输出目录，重新保存配置、日志、输入摘要、指标、解释和校验结果。
+
+\hypertarget{ux5de5ux7a0bux5b9eux65bdux4e0eux590dux73b0ux6e05ux5355}{%
+\subsection{8.11
+工程实施与复现清单}\label{ux5de5ux7a0bux5b9eux65bdux4e0eux590dux73b0ux6e05ux5355}}
+
+为使问题三从建模描述落实为可复现工程，实施时逐项执行以下清单：
+
+\begin{itemize}
+\tightlist
+\item[$\boxtimes$]
+  固定 \texttt{aligned\_50.pkl}
+  作为当前主路线特征版本，并在配置中写入文件 SHA-256；
+\item[$\boxtimes$]
+  核验附件二 train/valid/test
+  字段、维度、主键和标签范围，保持三个划分主键不交叉；
+\item[$\boxtimes$]
+  将有效掩码传入模态内编码、跨模态注意力和池化，保证 padding
+  不参与计算；
+\item[$\boxtimes$]
+  仅由训练集拟合标准化统计量，并将统计量随运行结果保存；
+\item[$\boxtimes$]
+  完成分类、回归双任务训练，保存最佳模型、训练日志、预测表和配置；
+\item[$\boxtimes$]
+  固定反事实遮挡窗口长度、步长和证据数量，导出模态贡献及局部窗口影响；
+\item[$\boxtimes$]
+  在有标签验证集上输出 Accuracy、Macro-F1、MAE、Pearson
+  与高低重要性窗口忠实性诊断；
+\item[$\boxtimes$]
+  在附件四上仅执行固定模型推理，导出预测、贡献、时间区间、帧区间和映射状态；
+\item[$\boxtimes$]
+  对每次运行保存异常记录、审计结果和输出 SHA-256，形成可追溯目录；
+\item[$\square$]
+  按 B0--B5、A1--A2 完成统一配置下的全量消融与多随机种子重复实验；
+\item[$\square$]
+  对文本相对时间代理、视频缺失映射样本和典型失败案例进行人工复核，并在论文结果章节单独说明。
+\end{itemize}
+
+综上，本文问题三方案在不改变题给数据边界的前提下，将预测、模态级解释和局部时间证据统一到同一可追溯流程。其核心贡献不在于将内部权重包装为解释，而在于通过模态与局部窗口反事实遮挡直接检验模型输出变化，并将可用证据映射回文本、音频时间段和视频关键帧。后续实验将以既定
+B0--B5、A1--A2
+对照和多随机种子重复为基础，进一步验证该方案的预测稳定性与解释可靠性。
+
+\end{document}

@@ -1,0 +1,18 @@
+{
+  "schema_version": "q3-v8-audit-v1",
+  "source_dir": "D:\\MCMM\\23rd-MCMM\\E-q\\q_3_output\\20260925_215043_145160100",
+  "base_package_audit_passed": true,
+  "technical_route_diagram": true,
+  "model_architecture_diagram": true,
+  "data_boundary_diagram": true,
+  "training_curve": true,
+  "local_importance_heatmaps": true,
+  "classification_report": true,
+  "modality_ablation_completed": true,
+  "all_outputs_finite": true,
+  "base_metrics_match_ablation_none": true,
+  "label_mapping_documented": true,
+  "attachment4_not_used_for_training_or_selection": true,
+  "paper_claims_limit": "retrained architecture baselines and multi-seed uncertainty are not claimed from this run",
+  "passed": true
+}

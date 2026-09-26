@@ -1,0 +1,14 @@
+{
+  "schema_version": "q3-v7-audit-v1",
+  "passed": true,
+  "checks": {
+    "train_valid_test_ids_disjoint": true,
+    "train_valid_test_counts": true,
+    "attachment4_full_prediction": true,
+    "contributions_sum_to_one": true,
+    "evidence_indices_in_range": true,
+    "attachment4_unlabeled": true,
+    "explanation_config_consistent": true
+  },
+  "video_decode_mismatch_count": 16
+}

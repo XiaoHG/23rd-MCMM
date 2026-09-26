@@ -1,0 +1,26 @@
+{
+  "status": "completed",
+  "epochs_requested": 50,
+  "epochs_completed": 50,
+  "total_optimizer_steps": 2700,
+  "best_valid_loss": 1.174445969717843,
+  "metrics": [
+    {
+      "split": "valid",
+      "accuracy": 0.6071428571428571,
+      "macro_f1": 0.5475654423938315,
+      "mae": 0.6520968079566956,
+      "pearson": 0.58099334145488
+    },
+    {
+      "split": "test",
+      "accuracy": 0.672627235213205,
+      "macro_f1": 0.5950226323536837,
+      "mae": 0.6794127821922302,
+      "pearson": 0.6259110708922812
+    }
+  ],
+  "output_dir": "D:\\MCMM\\23rd-MCMM\\E-q\\q_3_output\\20260925_100021_726334600",
+  "explanations_are_model_sensitivity": true,
+  "attachment4_has_no_ground_truth": true
+}

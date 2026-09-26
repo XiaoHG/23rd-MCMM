@@ -84,6 +84,14 @@ class TestQ3(unittest.TestCase):
         self.assertIn("audio", rows[0]["evidence"])
         self.assertIn("vision", rows[0]["evidence"])
 
+    def test_train_mean_explanation_baseline(self):
+        model = MaskedMultimodalNet({"text": 8, "audio": 4, "vision": 3}, hidden_dim=16, heads=4, layers=1, max_length=6)
+        batch = {"text": torch.from_numpy(self.bundle.text[:1]), "audio": torch.from_numpy(self.bundle.audio[:1]), "vision": torch.from_numpy(self.bundle.vision[:1]), "mask": torch.from_numpy(self.bundle.mask[:1])}
+        means = {"text": torch.zeros(8), "audio": torch.zeros(4), "vision": torch.zeros(3)}
+        rows = explain_batch(model, batch, window=2, stride=2, top_k=2, baseline="train_mean", modality_means=means)
+        self.assertEqual(rows[0]["explanation_baseline"], "train_mean")
+        self.assertAlmostEqual(sum(rows[0]["modality_contrib"]), 1.0, places=5)
+
 
 if __name__ == "__main__":
     unittest.main()

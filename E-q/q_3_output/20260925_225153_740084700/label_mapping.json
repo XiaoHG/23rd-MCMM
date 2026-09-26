@@ -1,0 +1,10 @@
+{
+  "source": "E-q/dataset/attachment_2_feature_files/aligned_50.pkl classification_labels and regression_labels",
+  "mapping": {
+    "0": "Negative",
+    "1": "Neutral",
+    "2": "Positive"
+  },
+  "verification": "training labels have class 0 regression range [-3,-1/3], class 1 exactly 0, class 2 range [1/6,3]",
+  "note": "Attachment 4 has no ground-truth class and does not use this mapping for evaluation."
+}

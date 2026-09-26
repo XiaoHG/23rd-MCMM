@@ -1,0 +1,4 @@
+﻿split,modality,pearson_gate_vs_counterfactual
+valid,text,0.10504615249323694
+valid,audio,0.034876774394755
+valid,vision,0.006138548751099973

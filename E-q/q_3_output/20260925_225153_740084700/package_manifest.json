@@ -1,0 +1,44 @@
+{
+  "source_dir": "D:\\MCMM\\23rd-MCMM\\E-q\\q_3_output\\20260925_213047_006377600",
+  "source_validation_audit": "D:\\MCMM\\23rd-MCMM\\E-q\\q_3_output\\20260925_213047_006377600\\validation_audit.json",
+  "model_source_dir": "D:\\MCMM\\23rd-MCMM\\E-q\\q_3_output\\20260925_100021_726334600",
+  "model_artifacts": {
+    "best_model.pt": {
+      "path": "D:\\MCMM\\23rd-MCMM\\E-q\\q_3_output\\20260925_215043_145160100\\model_artifacts\\best_model.pt",
+      "sha256": "490cb5412078200eeb49978bedfbe61aea8cdcdee98d7ba1bc0f608b0eeca652"
+    },
+    "train_standardizer.npz": {
+      "path": "D:\\MCMM\\23rd-MCMM\\E-q\\q_3_output\\20260925_215043_145160100\\model_artifacts\\train_standardizer.npz",
+      "sha256": "a50d8f9d020c341a0e3f4956d0a9b7b6dacddb3d74f506ca4da81b62b25f6e8d"
+    },
+    "training_log.csv": {
+      "path": "D:\\MCMM\\23rd-MCMM\\E-q\\q_3_output\\20260925_215043_145160100\\model_artifacts\\training_log.csv",
+      "sha256": "fcf34b321eac31ace5d698bf4404d7f7d71abc1d066ee5d348860cbf14652f98"
+    },
+    "run_config.json": {
+      "path": "D:\\MCMM\\23rd-MCMM\\E-q\\q_3_output\\20260925_215043_145160100\\model_artifacts\\run_config.json",
+      "sha256": "c8848fc30fe1ba7a7ea1ee0853a26160c57c6039f972f605a091f8c30f631fd8"
+    },
+    "run_summary.json": {
+      "path": "D:\\MCMM\\23rd-MCMM\\E-q\\q_3_output\\20260925_215043_145160100\\model_artifacts\\run_summary.json",
+      "sha256": "714cf5790fd7c6c11cfc9695e046f3c84467e1e9f62ad8c75135cbfdb9f69b90"
+    },
+    "input_data_summary.json": {
+      "path": "D:\\MCMM\\23rd-MCMM\\E-q\\q_3_output\\20260925_215043_145160100\\model_artifacts\\input_data_summary.json",
+      "sha256": "06030652fa4b76391f250263972ea01244e39318dc582afb5b9fe42bf937b7ce"
+    }
+  },
+  "generator": "D:\\MCMM\\23rd-MCMM\\scripts\\q3_v7_package.py",
+  "selected_explanation": {
+    "baseline": "train_mean",
+    "window": 7,
+    "stride": 7,
+    "sample_count": 728,
+    "mean_top_impact": 0.07485291513958911,
+    "mean_low_impact": 0.0032877145976848354,
+    "top_minus_low": 0.07156520054190428,
+    "top_to_low_ratio": 22.76746138253592
+  },
+  "source_prediction_sha256": "aeeca2760cef247abcff3fb42fd96c2eceb66d61e747c9247e17d3804aaffc5a",
+  "source_mapping_sha256": "725d497ccf9cc831a6f8d755e7de06628d8885d8beebac55d809a41ac5b0abf7"
+}
